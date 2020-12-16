@@ -1,0 +1,63 @@
+body{
+	background-color:navy;
+	font-family:  monospace;
+	font-weight:bold;
+	line-height:16px;
+	font-size:16px;
+	color:silver;
+}
+#game-desc{
+	margin-right:15vw;
+	margin-left:15vw;
+	text-align: center;/*justify;*/
+	/*text-justify: inter-word;*/
+	border:5px solid black;
+	background-color:blue;
+	padding:12px;
+	color:silver;
+}
+
+button {
+    background-color: silver;
+    border: 2px solid black;
+    color: blue;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 22px;
+  	font-family: courier, cursive;
+  	font-weight:bold;
+  	width: 70vw;
+}
+button:hover {
+  background-color: blue;
+  color: silver;
+  border: 2px solid silver;
+}
+
+buttonalt {
+    background-color: green;
+    border: 2px solid black;
+    color: silver;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+  	font-family: 'Rye', cursive;
+  	width: 69vw;
+}
+buttonalt:hover {
+  background-color: white;
+  color: green;
+  border: 2px solid saddlebrown;
+}
+
+#demo {
+	font-family:  monospace;
+	font-weight:bold;
+	color:silver;
+	line-height:18px;
+	font-size:16px;
+}

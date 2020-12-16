@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta charset="UTF-8">
+		<title>Quest 6 Adventure 1  by Richard Headkid</title>
+		<script src="game/rhfiles/jquerystuff/jquery-3.5.1.min.js"></script> 
+		<link rel="stylesheet" href="game/rhfiles/jquerystuff/jquery-ui-1.12.1/jquery-ui.css">
+		<script src="game/rhfiles/jquerystuff/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+		<script src="lib/_util.js"></script>
+		<script src="lib/_settings.js"></script>
+		<style>
+
+		</style>
+	</head>
+	<body>
+		<div id="main">
+		<div id="header"></div>
+		<iframe src="page.html" onload="getGame()" id="game" name="gameHolder" style="border:1px solid black;width:90vw;height:90vh;" allow></iframe>
+		<div id="footer"></div>
+		<div id="fake-wrapper" name="fakeWrapper" style="display:none">
+			<div id="output"></div>
+			<div id="input"></div>
+		</div>
+		</div>
+	</body>
+	<script>
+	var ifr = document.getElementById("game")
+	var game, objects, w, gameSettings, gameIo, gameWorld, iframeGame, parser, gameLang
+	function getGame(){
+		iframeGame = ifr.contentWindow
+		//NOW we have access to Quest functions!
+		//game.msg("hello")
+		objects = iframeGame.allObjects()
+		w = {}
+		objects.forEach( o => { w[o.name] = o } )
+		game = iframeGame.getGame()
+		gameSettings = iframeGame.getSettings()
+		gameIo = iframeGame.getIo()
+		gameWorld = iframeGame.getWorld()
+		parser = iframeGame.getParser()
+		gameLang = iframeGame.getLang()
+	}
+	</script>
+</html>
