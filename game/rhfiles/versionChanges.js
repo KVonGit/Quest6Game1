@@ -71,5 +71,8 @@ settings.versionChanges = [
 	
 	"0.22: Numerous bug fixes.<br><br>Added online check to postLoad on the TV.<br><br>"+
 	"Made item links work for objects in containers and held by npcs."+
-	"Moved files around again."
-]
+	"Moved files around again.",
+	
+	"0.23: Tweaked objects list stuff.<br><br>Began adding semicolons to my JS.<br><br>"+
+	"Switched from turnscript to <code>io.modulesToUpdate</code> to update item-links' verbs.  (Thanks to Pixie!)"
+];

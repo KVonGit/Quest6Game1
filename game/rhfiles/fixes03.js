@@ -4,6 +4,7 @@
 
 //============================================================================
 //BUG FIX for QJS 0.3 - no message printed when player's command is 'X'
+// Also didn't print anything when object not recognized.  (This may have been due to the EXAMINE fix?)
 
   parser.convertInputTextToCommandCandidate = function(inputText) {
     //let s = inputText.toLowerCase().split(' ').filter(function(el) { return !IGnored_words.includes(el); }).join(' ');
@@ -60,6 +61,7 @@
     parser.msg("Number of candidates accepted: " + matchedCandidates.length);
     if (matchedCandidates.length === 0) {
       parser.msg("No matches, returning error: " + error);
+      msg(error) // KV added this line.  It didn't print anything in-game.
       return error;
     }
     // pick between matchedCandidates based on score
@@ -116,9 +118,9 @@ world.enterRoomAfterScripts =function() {
 //---------------------
 
 
-		//-------------------------------------------------------------------
-		// BUG FIX QJS 0.3 - OPENABLE adding duplicate verbs onto pane items|
-		//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+// BUG FIX QJS 0.3 - OPENABLE adding duplicate verbs onto pane items|
+//-------------------------------------------------------------------
 		
 		OPENABLE_DICTIONARY.close = function(isMultiple, char) {
 		    const tpParams = {char:char, container:this}
@@ -136,6 +138,6 @@ world.enterRoomAfterScripts =function() {
 		    if (this.onClose) this.onClose(char)
 		    return true;
 	    };
-		//-----------------------------------------------------------
-		//END OF FIX OPENABLE adding duplicate verbs onto pane items|
-		//-----------------------------------------------------------
+//-----------------------------------------------------------
+//END OF FIX OPENABLE adding duplicate verbs onto pane items|
+//-----------------------------------------------------------

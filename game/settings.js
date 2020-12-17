@@ -1,30 +1,30 @@
 "use strict"
 
-const log = console.log
-const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} }
-const parserlog = (s) => { if(parser.debug){ log(s)} }
-const debuginfo = (s) => { console.info(s) }
+const log = console.log;
+const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
+const parserlog = (s) => { if(parser.debug){ log(s)} };
+const debuginfo = (s) => { console.info(s) };
 
-settings.title = "Quest 6 Adventure 1"
-settings.author = "Richard Headkid"
-settings.version = "0.22"
-settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL"
-settings.ifid = "879d6c2b-1fe5-4c78-b9f5-579de6310ec6"
-settings.serialNumber = "201202"
-settings.genre = "Absurdist Fiction"
-settings.firstPublished = "2020-12-12"
+settings.title = "Quest 6 Adventure 1";
+settings.author = "Richard Headkid";
+settings.version = "0.23";
+settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
+settings.ifid = "879d6c2b-1fe5-4c78-b9f5-579de6310ec6";
+settings.serialNumber = "201202";
+settings.genre = "Absurdist Fiction";
+settings.firstPublished = "2020-12-12";
 
 
 //Set the next line to play, dev, or beta
 //Default is 'play'
-settings.playMode = 'dev' //Set to "play" before release!!!
+settings.playMode = 'dev'; //Set to "play" before release!!!
 
 
 settings.subtitle = "<small style='color:gray;cursor:pointer;' onclick='clickedVersion()' title='THANKS FOR PLAYING!'><u><i>VERSION "+settings.version+"</i></u></small><hr/>"
 
-settings.iconsFolder = false  // false: turns off the icons in the panes
+settings.iconsFolder = false;  // false: turns off the icons in the panes
 
-settings.linksEnabled = true
+settings.linksEnabled = true;
 //========================================
 //Backup setting.files to filesBak variable
 var filesBak = settings.files;

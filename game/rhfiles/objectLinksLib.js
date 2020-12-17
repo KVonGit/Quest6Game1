@@ -8,7 +8,7 @@
 //====================
 // for QuestJS v 0.3 |
 //====================
-// Version 2         |
+// Version 3         |
 //====================
 
 /*
@@ -67,13 +67,13 @@ settings.roomTemplate = [
 
 // MODDED for item links
 util.listContents = function(situation, modified = true) {
-  let objArr = this.getContents(situation)
+  let objArr = this.getContents(situation);
   if (settings.linksEnabled) {
-	  objArr = objArr.map(o => getObjectLink(o,true))
+	  objArr = objArr.map(o => getObjectLink(o,true));
 	  //debuglog(objArr)
   }
-  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name})
-}
+  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name});
+};
 
 
 // Make it easy to find a command's opposite
@@ -91,24 +91,19 @@ settings.cmdOpps = {
 // END OF SETTINGS
 
 
-// TURNSCRIPT
-
-createItem("updateDropdownVerblists_Turnscript",{
-	eventPeriod:1,
-	eventActive:true,
-	eventScript:()=>{
-		if(settings.linksEnabled){
-			if(settings.debugItemLinks) {
-				debuglog("running turnscript to update verbs . . .")
-			}
-			updateDropdownVerblists()
-		}else{
-			w.updateDropdownVerblists_Turnscript.eventActive = false
+// UPDATE THE VERB LINKS!
+const itemLinks = {}
+io.modulesToUpdate.push(itemLinks)
+itemLinks.update = function() {
+	if(settings.linksEnabled){
+		if(settings.debugItemLinks) {
+			debuglog("running turnscript to update verbs . . .")
 		}
-	},
-})
-
-
+		updateDropdownVerblists()
+	}else{
+		w.updateDropdownVerblists_Turnscript.eventActive = false
+	}
+}
 
 //===========================
 // TEXT PROCESSOR ADDITIONS |
@@ -193,30 +188,57 @@ function getObjectsLinks(arr, turn, art){
 	  //debuglog(objs)
 	  objs.forEach(o => {
 		oLink = getObjectLink(o, turn, art) // Set the object link
-		if ((o.listContents && !o.closed && o.listContents().length>0) || (!o.listContents && o.npc && o.getContents.length>0)) {  // If open container or npc . . .
-			let contents = "" // Create blank string variable
-			if (o.container){ // If this is a container . . .
-				contents  = o.listContents()  // Get a list of the contents. (I modified util.listContents in mods.js to put out object links)
-				if (contents != ""){ // If there are actually contents . . .
-					oLink = oLink + " (containing: " + contents + ")" // Add the contents to the item link.
-				}
-			}
-			if (o.npc) { // If this is an npc . . .
-				contents =  o.getHolding().map(x => getObjectLink(x, turn, art)) // Set the list of contents, with item links.
-				if (contents != ""){ // If there are actually contents . . .
-					oLink = oLink + " (carrying: " + contents + ")" // Add the contents to the item link.
-				}
-			}
-		}
+		let oLinkAddon = getObjectsLinksContents(o, turn, art)
+		oLink += oLinkAddon
 		objArr.push(oLink)  // Add the object (with link) to the list!
 	  })
   }
   return objArr
 }
-function getObjectLink(obj,isScopeHere=false,addArticle=true){
+
+function getObjectsLinksContents(o, turn, art){
+	// SHOULD THIS CHECK FOR SCENERY?
+	let s = "";
+	let pre = "";
+	if (o.container) {
+		switch (o.contentsType) {
+			case "container":
+				pre = "containing: ";
+				break;
+			case "surface":
+				pre = "on which you see: ";
+				break;
+			default:
+				// Do  nothing
+		}
+	}
+	if (o.npc) {
+		pre = "carrying: ";
+	}
+	if ((o.listContents && !o.closed && o.listContents().length>0) || (!o.listContents && o.npc && o.getContents.length>0)) {  // If open container or npc . . .
+		let contents = "" // Create blank string variable
+		if (o.container){ // If this is a container . . .
+			contents  = o.listContents()  // Get a list of the contents. (I modified util.listContents in mods.js to put out object links)
+		}
+		if (o.npc) { // If this is an npc . . .
+			contents =  o.getHolding().map(x => getObjectLink(x, turn, art)) // Set the list of contents, with item links.
+		}
+		if (contents != "nothing" && contents != ""){ // If there are actually contents . . .
+			let stuff = o.getContents()
+			let stuffList = stuff.filter(ob => ob.container).map(ob => getObjectsLinksContents(ob))
+			contents += stuffList;
+		}
+		if (contents != "nothing" && contents != ""){
+			s += " (" + pre + contents + ")" // Add the contents to the item link.
+		}
+	}
+	return s
+}
+
+function getObjectLink(obj, disableAfterTurn=false, addArticle=true){
 	//if isScopeHere is sent true, this is for a room description!
 	if(settings.linksEnabled){
-		var roomClass = isScopeHere ? "room-desc" : ""
+		var endangered = disableAfterTurn ? "single-turn-link" : ""
 		var oName = obj.name
 		var id = obj.alias || obj.name;
 		var prefix = "";
@@ -226,14 +248,14 @@ function getObjectLink(obj,isScopeHere=false,addArticle=true){
 		var dispAlias = getDisplayAlias(obj)
 		if (addArticle) {prefix = dispAlias.replace(obj.alias,'')}
 		disableObjectLink($(`[obj="${oName}"]`))
-		var s = prefix+`<span class="object-link dropdown ${roomClass}">`;
-		s +=`<span onclick="toggleDropdown($(this).attr('obj'))" obj="${oName}" class="droplink ${roomClass}" name="${oName}-link">${id}</span>`;
-		s += `<span id="${oName}" class="dropdown-content ${roomClass}">`;
+		var s = prefix+`<span class="object-link dropdown ${endangered}">`;
+		s +=`<span onclick="toggleDropdown($(this).attr('obj'))" obj="${oName}" class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
+		s += `<span id="${oName}" class="dropdown-content ${endangered}">`;
 		let verbArr = obj.getVerbs()
 		if (verbArr.length>0){
 			verbArr.forEach (o=>{
 				o = capFirst(o)
-				s += `<span style="white-space:nowrap" class="${roomClass}" onclick="$(this).parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
+				s += `<span class="${endangered} list-link-verb" onclick="$(this).parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
 			})
 		}
 		s += "</span></span>";
@@ -332,10 +354,10 @@ function disableExistingObjectLinks(bool=false){
 		$(".dropdown").removeClass("dropdown")
 		$(".dropdown-content").remove()
 	} else {
-		$(".room-desc.droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink")
-		$(".room-desc.object-link").removeClass("dropdown")
-		$(".room-desc.dropdown").removeClass("dropdown")
-		$(".room-desc.dropdown-content").remove()
+		$(".single-turn-link.droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink")
+		$(".single-turn-link.object-link").removeClass("dropdown")
+		$(".single-turn-link.dropdown").removeClass("dropdown")
+		$(".single-turn-link.dropdown-content").remove()
 	}
 }
 
@@ -351,11 +373,14 @@ function disableObjectLink(el){
 findCmd('Inv').script = function() {
   let listOfOjects = game.player.getContents(world.INVENTORY);
   if (settings.linksEnabled) {
-	  listOfOjects = listOfOjects.map(o => getObjectLink(o,true))
+	  listOfOjects = getObjectsLinks(listOfOjects, true)
   }
   msg(lang.inventoryPreamble + " " + formatList(listOfOjects, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.name}) + ".");
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 }
+
+
+
 // MOD!!!
   // the NPC has already been moved, so npc.loc is the destination
   lang.npcEnteringMsg = function(npc, origin) {
@@ -422,5 +447,10 @@ $("head").append(`<style>
 
 .dropdown a:hover {background-color: #ddd}
 
-.show {display:block;}
+.show {display:block;
+
+.list-link-verb {
+	white-space:nowrap
+}
+}
 </style>`)

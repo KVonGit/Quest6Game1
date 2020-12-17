@@ -1,24 +1,24 @@
 "use strict"
 	
-lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>"
+lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
 
-findCmd("MetaCredits").script = function(){lang.aboutScript()}
+findCmd("MetaCredits").script = function(){lang.aboutScript()};
 lang.aboutScript = function() {
 	let s = "{b:{param:settings:title}}<br/>"+
 	//"{param:settings:subtitle}"+
 	" by {param:settings:author}"+
 	"<small><br/>Release {param:settings:version} / Quest 6 build {param:settings:questVersion}"+
-	"<br/>Identification number: {param:settings:ifid}</small>"
+	"<br/>Identification number: {param:settings:ifid}</small>";
     metamsg(s, {settings:settings});
     if (settings.thanks && settings.thanks.length > 0) {
-      var thanks = "Thanks to " + formatList(settings.thanks, {lastJoiner:lang.list_and}) + "."
-	  msg(thanks) 
+      var thanks = "Thanks to " + formatList(settings.thanks, {lastJoiner:lang.list_and}) + ".";
+	  msg(thanks);
     }
     if (settings.additionalAbout !== undefined) {
       for (let s of settings.additionalAbout) metamsg(s)
     }
     return world.SUCCESS_NO_TURNSCRIPTS;
-}
+};
 
 
 //MODIFY 'ABOUT' COMMAND (add 'info' and 'information')
@@ -76,13 +76,13 @@ Click 'Lk' to look at you current location, 'Z' to wait or '?' for help.";
 
 //For QJS 0.3
 //Make parser understand the Oxford comma!
-lang.joiner_regex = /\b\, and\b|\,|\band\b/
+lang.joiner_regex = /\b\, and\b|\,|\band\b/;
 
 
 //Make clicked commands add to list history (to fix AGAIN cmd)
 io.cmdlink = function(command, str) {
   return `<a class="cmd-link" onclick="parser.parse('${command}');clickedCmdLink('${command}');">${str}</a>`;
-}
+};
 
 //Make clicked "exits" add to list history (to fix AGAIN cmd)
 io.clickExit = function(dir) {
@@ -99,7 +99,7 @@ io.clickItemAction = function(itemName, action) {
   if (io.inputIsDisabled) return;
 
   const item = w[itemName];
-  action = action.split(' ').map(el => sentenceCase(el)).join('')
+  action = action.split(' ').map(el => sentenceCase(el)).join('');
   const cmd = io.getCommand(action);
     $("#textbox").val(findCmd(action).name.replace(/([A-Z])/g, ' $1').trim() + " " + item.alias);
     enterButtonPress();
@@ -110,40 +110,40 @@ io.clickItemAction = function(itemName, action) {
 
 //KV MODDED TAKE for TAKE ALL
 
-findCmd('Take').script2 = findCmd('Take').script
+findCmd('Take').script2 = findCmd('Take').script;
 
 findCmd('Take').script = function(objects,matches){
-	let success = false
+	let success = false;
 	if (objects[0].length < 1 && parser.currentCommand.all) {
 		//Tried to TAKE ALL when there is nothing to take!
-		var verbUsed = parser.currentCommand.cmdString.replace(/ .*/,'').toLowerCase()
-		metamsg("There is no ALL to "+verbUsed+"!")
-		success =  false
+		var verbUsed = parser.currentCommand.cmdString.replace(/ .*/,'').toLowerCase();
+		metamsg("There is no ALL to "+verbUsed+"!");
+		success =  false;
 	}else{
-		success = findCmd('Take').script2(objects,matches)
+		success = findCmd('Take').script2(objects,matches);
 	}
 	return success ? world.SUCCESS : world.FAILED;
-}
+};
 
 //===========
 // Add OOPS |
 //===========
 
-parser.commandHistory = [] //KV added for modded parser functions
-parser.enteredCmdArr = [] //KV added for modded parser functions
+parser.commandHistory = []; //KV added for modded parser functions
+parser.enteredCmdArr = []; //KV added for modded parser functions
 
 
 //  KV MODIFIED this function to allow OOPS (and to generally keep histories of commands)
   parser.parse = function(inputText) {
     parser.msg("Input string: " + inputText);
-    parser.enteredCmdArr.push(inputText) //KV added to keep entered command history
+    parser.enteredCmdArr.push(inputText); //KV added to keep entered command history
     // This allows the command system to be temporarily overriden,
     // say if the game asks a question
     if (parser.override) {
       parser.msg("Parser overriden");
-      parser.override(inputText)
-      delete parser.override
-      return
+      parser.override(inputText);
+      delete parser.override;
+      return;
     }
     
     if (inputText) {
@@ -153,7 +153,7 @@ parser.enteredCmdArr = [] //KV added for modded parser functions
         world.endTurn(world.PARSER_FAILURE);
         return;
       }
-      parser.commandHistory.push(parser.currentCommand) //KV added to keep command history
+      parser.commandHistory.push(parser.currentCommand); //KV added to keep command history
       parser.currentCommand = res;
     }
     
@@ -181,9 +181,9 @@ parser.enteredCmdArr = [] //KV added for modded parser functions
 		
       parser.execute();
  
-		parser.lastCmdWasExecuted = true //KV added for OOPS
-		parser.Unfound = false //KV added for OOPS
-		parser.failedCmd = false //KV added for OOPS
+		parser.lastCmdWasExecuted = true; //KV added for OOPS
+		parser.Unfound = false; //KV added for OOPS
+		parser.failedCmd = false; //KV added for OOPS
     }
   };
  
@@ -194,7 +194,7 @@ parser.enteredCmdArr = [] //KV added for modded parser functions
     const res = {cmd:cmd, objectTexts:[], objects:[], matches:[]};
     res.score = cmd.score ? cmd.score : 0;
     
-    const arr = cmd.regexes.find(el => el.test(s)).exec(s)
+    const arr = cmd.regexes.find(el => el.test(s)).exec(s);
     //for (let regex of el.regexes) {
     //  if (regex.test(cmdString)) arr = regex.exec(s)
     //}
@@ -203,7 +203,7 @@ parser.enteredCmdArr = [] //KV added for modded parser functions
     const fallbackScope = parser.scope(parser.isVisible);
         //if(arr.length>1) {
 		//console.log(arr)
-		parser.msg("Testing...")
+		parser.msg("Testing...");
 		
 		//}
     arr.shift();  // first element is the whole match, so discard
@@ -303,9 +303,9 @@ parser.enteredCmdArr = [] //KV added for modded parser functions
           [objs2, n] = this.findInScope(objNameMatch[1], scopes, cmd.objects[i]);
           if (n === 0) {
 			  //console.log("KV says: unfound object (s) set to parser.unFound!") //KV added for OOPS
-			  parser.unFound = s // KV added for OOPS
-			  parser.lastCmdWasExecuted = false //KV added for OOPS
-			  parser.failedCmd = cmd  //KV added for OOPS
+			  parser.unFound = s; // KV added for OOPS
+			  parser.lastCmdWasExecuted = false; //KV added for OOPS
+			  parser.failedCmd = cmd;  //KV added for OOPS
             res.error = cmd.noobjecterror(s);
             res.score = -1;
             return res;
@@ -362,8 +362,8 @@ commands.push(new Cmd('Oops', {
 		metamsg("There is nothing to correct.");
 		return false;
 	}
-	parser.quickCmd(parser.failedCmd,item)
-	return true
+	parser.quickCmd(parser.failedCmd,item);
+	return true;
   },
 }));
 
@@ -373,18 +373,18 @@ commands.push(new Cmd('Oops', {
 
 //KV added this function to make life simple.
 function getLastCmd(){
-	return parser.commandHistory[parser.commandHistory.length - 1]
+	return parser.commandHistory[parser.commandHistory.length - 1];
 }
 
 function getCurrentCmd(){
-	return parser.currentCmd
+	return parser.currentCmd;
 }
 
 
 //KV added this function to make life simple.
 
 function getLastEnteredCmd(){
-	return parser.enteredCmdArr[parser.enteredCmdArr.length-2]
+	return parser.enteredCmdArr[parser.enteredCmdArr.length-2];
 }
 
 

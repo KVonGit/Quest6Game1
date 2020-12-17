@@ -1,5 +1,18 @@
 "use strict"
 
+createItem("table", SURFACE(), {
+	loc:"cellar"
+})
+
+createItem("box", TAKEABLE(), CONTAINER(true), {
+	loc:"table",
+	closed:false
+})
+
+createItem("doohickey", TAKEABLE(), {
+	loc:"box"
+})
+
 // Carried by the player
 
 createItem("cigarette",TAKEABLE(),{
