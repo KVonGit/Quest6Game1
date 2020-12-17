@@ -118,7 +118,7 @@ window.onclick = function(event) {
 
 settings.roomTemplate = [
   "{hereDesc}",
-  "{objectsHere:You can see {objectsLinks} here.}",
+  "{objectsHere:You can see {objectsHereLinks} here.}",
   "{exitsHere:You can go {exits}.}",
 ]
 
@@ -165,12 +165,12 @@ createItem("updateDropdownVerblists_Turnscript",{
 
 tp.text_processors.objectsHereLinks = function(arr, params) {
   // Create listOfOjects array comprised of all objects listed here, with links for the objects.
-  let listOfOjects = scopeHereListed().map(o => getObjectLink(o,true))
-  return listOfOjects.length === 0 ? "" : arr.join(":");
+  let listOfOjects = getObjectsLinks(scopeHereListed(),true)
+  return listOfOjects.length === 0 ? "" : formatList(listOfOjects, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
 };
 
-tp.text_processors.objectsLinks = function(arr, params) {
-  let objArr = getObjectsHereLinks()
+tp.text_processors.objectsLinks = function(arr, params, bool) {
+  let objArr = getObjectsLinks(arr, bool, false)
   return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
 }
 
@@ -232,14 +232,14 @@ function clickedCmdLink(s){
 	}
 }
 
-function getObjectsHereLinks(){
-  let objs = scopeHereListed() // Create array of objects here.
+function getObjectsLinks(arr, turn, art){
+  let objs = arr // Create array of objects here.
   let objArr = [] // Blank array to push to later in the function
   let oLink // Blank variable for the object link (used later in the function)
-  if (objs.length) { // If there are objects in this array . . .
+  if (objs.length > 0) { // If there are objects in this array . . .
 	  //debuglog(objs)
 	  objs.forEach(o => {
-		oLink = getObjectLink(o, true) // Set the object link
+		oLink = getObjectLink(o, turn, art) // Set the object link
 		if ((o.listContents && !o.closed && o.listContents().length>0) || (!o.listContents && o.npc && o.getContents.length>0)) {  // If open container or npc . . .
 			let contents = "" // Create blank string variable
 			if (o.container){ // If this is a container . . .
@@ -249,7 +249,7 @@ function getObjectsHereLinks(){
 				}
 			}
 			if (o.npc) { // If this is an npc . . .
-				contents =  o.getHolding().map(x => getObjectLink(x, true)) // Set the list of contents, with item links.
+				contents =  o.getHolding().map(x => getObjectLink(x, turn, art)) // Set the list of contents, with item links.
 				if (contents != ""){ // If there are actually contents . . .
 					oLink = oLink + " (carrying: " + contents + ")" // Add the contents to the item link.
 				}
