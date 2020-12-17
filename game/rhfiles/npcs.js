@@ -48,8 +48,7 @@ createItem("laptop", {
 		msg("XM is looking at you like you're not OK . . .")
 		msg("{blur:The room is . . .}")
 		wait()
-		//go to different game.
-		
+		msg("TODO: Finish writing this part!") //go to different game.
 	},
 }),
 

@@ -49,48 +49,6 @@ commands.push(new Cmd('Give', {
 			})
 		}
 	})
-	
-	
-	//var choices = ""
-	//var a = '<ul id="npc-menu">'+
-	//'<li class="ui-state-disabled"><div>Grues (n/a)</div></li>'+
-	//'<li><div>NPCs</div>'+
-	//'<ul>'+
-	//'<li class="ui-state-disabled"><div>NPCs</div></li>'
-	//npcs.forEach(npc=>{
-		//choices+="<li><div>"+npc.alias+"</div></li>"
-	//})
-	
-	//a+=choices
-	//a+='</ul>'+
-	//'</li>'+
-	//'<li class="ui-state-disabled"><div>Swimsuit models (n/a)</div></li>'+
-	//'</ul>'
-	//msg("To whom would you like to give {nm:item}?",{item:item})
-	//msg(a)
-	//$(".ui-menu").attr("width","150px")
-	//$( function() {
-		//$("#npc-menu" ).menu();
-	//} );
-	//$( "#npc-menu" ).menu({
-		//select: function( event, ui ) {
-			////console.log(event);
-			//console.log(ui)
-			//console.log(ui[0])
-			//var result  = ui.item[0].innerText
-			//var obj = w[result]
-			//console.log(obj)
-			//var result = confirm("You picked: " + obj.name + ".")
-			//if(!result){metamsg("Cancelled.");}
-			//else{
-				//msg("You chose Ralph.")
-				//$("#textbox").val("give it to " + obj.alias)
-				//enterButtonPress()
-				////setTimeout(()=>{$("#npc-menu").remove();},2000)
-			//}
-			//$("#npc-menu").remove()
-		//}
-	//});
   },
 }));
 

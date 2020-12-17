@@ -70,7 +70,7 @@ util.listContents = function(situation, modified = true) {
   let objArr = this.getContents(situation)
   if (settings.linksEnabled) {
 	  objArr = objArr.map(o => getObjectLink(o,true))
-	  debuglog(objArr)
+	  //debuglog(objArr)
   }
   return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name})
 }

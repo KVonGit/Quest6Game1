@@ -67,53 +67,53 @@ function upArrowButtonPress(){
 //END BUTTON PRESS SIMS |
 //=======================
 
-lang.getName=function(item, options) {
-    let alias = item.alias || item.name
-    if (!options) options = {}
-    //if (!item.alias) item.alias = item.name
-    let s = ''
-    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
-    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
+//lang.getName=function(item, options) {
+    //let alias = item.alias || item.name
+    //if (!options) options = {}
+    ////if (!item.alias) item.alias = item.name
+    //let s = ''
+    //let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
+    //if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
 
-    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
-      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
-    }
+    //if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
+      //s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
+    //}
 
-    else {    
-      if (count && count > 1) {
-        s += lang.toWords(count) + ' '
-      }
-      else if (options.article === DEFINITE) {
-        s += lang.addDefiniteArticle(item)
-      }
-      else if (options.article === INDEFINITE) {
-        s += lang.addIndefiniteArticle(item, count)
-      }
-      if (item.getAdjective) {
-        s += item.getAdjective()
-      }
-      if (!count || count === 1) {
-        s += item.alias
-      }
-      else if (item.pluralAlias) {
-        s += item.pluralAlias
-      }
-      else {
-        s += alias + "s"
-      }
-      if (options.possessive) {
-        if (s.endsWith('s')) {
-          s += "'"
-        }
-        else { 
-          s += "'s"
-        }
-      }
-    }
-    s += util.getNameModifiers(item, options)
+    //else {    
+      //if (count && count > 1) {
+        //s += lang.toWords(count) + ' '
+      //}
+      //else if (options.article === DEFINITE) {
+        //s += lang.addDefiniteArticle(item)
+      //}
+      //else if (options.article === INDEFINITE) {
+        //s += lang.addIndefiniteArticle(item, count)
+      //}
+      //if (item.getAdjective) {
+        //s += item.getAdjective()
+      //}
+      //if (!count || count === 1) {
+        //s += item.alias
+      //}
+      //else if (item.pluralAlias) {
+        //s += item.pluralAlias
+      //}
+      //else {
+        //s += alias + "s"
+      //}
+      //if (options.possessive) {
+        //if (s.endsWith('s')) {
+          //s += "'"
+        //}
+        //else { 
+          //s += "'s"
+        //}
+      //}
+    //}
+    //s += util.getNameModifiers(item, options)
 
-    return (options && options.capital ? sentenceCase(s) : s)
-  }
+    //return (options && options.capital ? sentenceCase(s) : s)
+  //}
 
 
 

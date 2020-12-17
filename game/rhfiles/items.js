@@ -142,7 +142,7 @@ createItem("TV", SWITCHABLE(false), {
 		onlineCheck()
 		if (settings.noConnection) {
 			// No internet connection.  Abort.
-			debuginfo( "There is no internect connection.  YouTube will be bypassed during this session.")
+			debuginfo( "There is no internet connection.  YouTube will be bypassed during this session.")
 			return
 		}
 		w.TV.loadingSave = true // This is to make sure the sound works when there were no saved settings.

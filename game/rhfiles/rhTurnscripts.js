@@ -15,20 +15,6 @@ createItem("updateStatusBar_Turnscript",
 );
 
 
-// MOVED to: objectLingsLib.js!!!
-// For object links!
-//createItem("updateDropdownVerblists_Turnscript",{
-	//eventPeriod:1,
-	//eventActive:true,
-	//eventScript:()=>{
-		//if(settings.linksEnabled){
-			//updateDropdownVerblists()
-		//}else{
-			//w.updateDropdownVerblists_Turnscript.eventActive = false
-		//}
-	//},
-//})
-
 createItem("spreaderEvent",
   {
 	  eventPeriod:1,
