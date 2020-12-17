@@ -67,5 +67,8 @@ settings.versionChanges = [
 	"Much thanks to Pixie, mrangel, and Pertex for all the help with things fixed in this version!<br><br>"+
 	"Moved some files around.",
 	
-	"0.21: Numerous changes to YouTube functions, to make Save/Load work correctly (or at least to try)."
+	"0.21: Numerous changes to YouTube functions, to make Save/Load work correctly (or at least to try).",
+	
+	"0.22: Numerous bug fixes.<br><br>Added online check to postLoad on the TV.<br><br>"+
+	"Made item links work for objects in containers and held by npcs."
 ]

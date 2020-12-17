@@ -32,48 +32,6 @@ body {
 }
 
 
-.droplink{
-	color:blue;
-}
-.droplink:not(.disabled) {
-    /*background-color: #3498DB;
-    color: blue;
-    padding: 16px;
-    font-size: 16px;
-    border: none;*/
-    cursor: pointer;
-}
-
-.droplink:hover:not(.disabled), .droplink:focus:not(.disabled), .exit-link:hover:not(.disabled) {
-    color: blue;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    overflow: auto;
-	border: 1px solid black;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content span {
-    color: black;
-    padding: 6px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown a:hover {background-color: #ddd}
-
-.show {display:block;}
-
 #footer {
 	margin:14px;
 }
@@ -228,11 +186,6 @@ span.compass-button {
 #dialog {
   display:none;
 }
-
-
-
-
-
 
 
 // Used by showMenu

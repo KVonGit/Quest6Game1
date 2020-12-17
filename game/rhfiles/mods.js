@@ -225,13 +225,16 @@ world.enterRoomAfterScripts =function() {
 findCmd('Take').script2 = findCmd('Take').script
 
 findCmd('Take').script = function(objects,matches){
+	let success = false
 	if (objects[0].length < 1 && parser.currentCommand.all) {
 		//Tried to TAKE ALL when there is nothing to take!
 		var verbUsed = parser.currentCommand.cmdString.replace(/ .*/,'').toLowerCase()
 		metamsg("There is no ALL to "+verbUsed+"!")
+		success =  false
 	}else{
-		findCmd('Take').script2(objects,matches)
+		success = findCmd('Take').script2(objects,matches)
 	}
+	return success ? world.SUCCESS : world.FAILED;
 }
 
 //===========
@@ -496,5 +499,15 @@ function getLastEnteredCmd(){
 	return parser.enteredCmdArr[parser.enteredCmdArr.length-2]
 }
 
+
+// Added for item links
+util.listContents = function(situation, modified = true) {
+  let objArr = this.getContents(situation)
+  if (settings.linksEnabled) {
+	  objArr = objArr.map(o => getObjectLink(o,true))
+	  debuglog(objArr)
+  }
+  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name})
+}
 //END OF MODIFIED FUNCTIONS
 

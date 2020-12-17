@@ -342,6 +342,10 @@ function setNoConnection(){
 	log("SYSTEM MESSAGE:\nThere is no internet connection. YouTube functionality has been deactivated.")
 }
 
+//const isIE = () => {
+    //const ua = navigator.userAgent;
+    //return ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1;
+//};
 
 //For if the game is in an iframe.
 //function getGame(){

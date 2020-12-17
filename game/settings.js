@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) }
 
 settings.title = "Quest 6 Adventure 1"
 settings.author = "Richard Headkid"
-settings.version = "0.21"
+settings.version = "0.22"
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL"
 settings.ifid = "879d6c2b-1fe5-4c78-b9f5-579de6310ec6"
 settings.serialNumber = "201202"
@@ -183,6 +183,10 @@ settings.setup = function(){
 		//}
 		
 		//cloneObject(w.grocery_sack, game.player.loc)
+		
+		//parser.debug = true
+		//settings.debugItemLinks = true
+
 };
 
 
@@ -201,4 +205,5 @@ const walkthroughs = {
     "u", "u", "open fridge", "get beer", "e", "give lighter to xm", "light cig", "give beer to xan",
   ]
 }
+
 

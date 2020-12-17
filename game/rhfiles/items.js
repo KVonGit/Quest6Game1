@@ -139,6 +139,12 @@ createItem("TV", SWITCHABLE(false), {
 	},
 	postLoad:()=>{
 		//debuginfo("Running postLoad on TV . . .")
+		onlineCheck()
+		if (settings.noConnection) {
+			// No internet connection.  Abort.
+			debuginfo( "There is no internect connection.  YouTube will be bypassed during this session.")
+			return
+		}
 		w.TV.loadingSave = true // This is to make sure the sound works when there were no saved settings.
 		if (w.TV.ytPlayerInfo){  // Was the TV playing a video?
 			//debuginfo("Found ytPlayerInfo")
