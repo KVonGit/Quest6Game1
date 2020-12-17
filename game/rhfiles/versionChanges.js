@@ -74,5 +74,7 @@ settings.versionChanges = [
 	"Moved files around again.",
 	
 	"0.23: Tweaked objects list stuff.<br><br>Began adding semicolons to my JS.<br><br>"+
-	"Switched from turnscript to <code>io.modulesToUpdate</code> to update item-links' verbs.  (Thanks to Pixie!)"
+	"Switched from turnscript to <code>io.modulesToUpdate</code> to update item-links' verbs.  (Thanks to Pixie!)",
+	
+	"0.24: Major changes to item links verbs update system.  Fixed CSS for verbs drop downs (again)."
 ];

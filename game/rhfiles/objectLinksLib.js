@@ -8,19 +8,29 @@
 //====================
 // for QuestJS v 0.3 |
 //====================
-// Version 3         |
+// Version 4         |
 //====================
 
 /*
  * IMPORTANT!!!
  * ------------
  * 
- * Make sure you have this loading before any files which create rooms or items! 
+ * Make sure you have this file loading before any files which create rooms or items! 
  * 
  *  */
 
 
-//MOD for object links
+// YOU NEED TO UNCOMMENT THESE IF NOT ALREADY DECLARED!
+//const log = console.log;
+//const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
+//const parserlog = (s) => { if(parser.debug){ log(s)} };
+//const debuginfo = (s) => { console.info(s) };
+
+//-------------------------------------------------
+
+
+
+//MOD for object links in room descriptions
 DEFAULT_ROOM.description = function() {
     if (game.dark) {
       printOrRun(game.player, this, "darkDesc");
@@ -75,19 +85,6 @@ util.listContents = function(situation, modified = true) {
   return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name});
 };
 
-
-// Make it easy to find a command's opposite
-settings.cmdOpps = {
-	"Switch on":"Switch off",
-	"Switch off":"Switch on",
-	"Take":"Drop",
-	"Drop":"Take",
-	"Wear":"Remove",
-	"Remove":"Wear",
-	"Open":"Close",
-	"Close":"Open",
-}
-
 // END OF SETTINGS
 
 
@@ -97,11 +94,10 @@ io.modulesToUpdate.push(itemLinks)
 itemLinks.update = function() {
 	if(settings.linksEnabled){
 		if(settings.debugItemLinks) {
-			debuglog("running turnscript to update verbs . . .")
+			debuglog("running itemLinks.update() to update verbs . . .")
 		}
-		updateDropdownVerblists()
-	}else{
-		w.updateDropdownVerblists_Turnscript.eventActive = false
+		//updateDropdownVerblists()
+		updateAllItemLinkVerbs();
 	}
 }
 
@@ -141,20 +137,7 @@ tp.text_processors.objectLink = function(obj, params) {
 // FUNCTIONS
 // ---------
 
-function capFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1)
-}
 
-
-function getDisplayAlias(obj,art=INDEFINITE){
-	return lang.getName(obj,{article:art})
-}
-
-
-// NOTE: getAlias is not used by any function in this library.
-function getAlias(obj){
-	return obj.alias || obj.name
-};
 
 function enterButtonPress(cmd){
 	//Calling this function with no arg will cause s to default to the text in the textbox.
@@ -188,7 +171,7 @@ function getObjectsLinks(arr, turn, art){
 	  //debuglog(objs)
 	  objs.forEach(o => {
 		oLink = getObjectLink(o, turn, art) // Set the object link
-		let oLinkAddon = getObjectsLinksContents(o, turn, art)
+		let oLinkAddon = getObjectLinkContents(o, turn, art)
 		oLink += oLinkAddon
 		objArr.push(oLink)  // Add the object (with link) to the list!
 	  })
@@ -196,7 +179,7 @@ function getObjectsLinks(arr, turn, art){
   return objArr
 }
 
-function getObjectsLinksContents(o, turn, art){
+function getObjectLinkContents(o, turn, art){
 	// SHOULD THIS CHECK FOR SCENERY?
 	let s = "";
 	let pre = "";
@@ -225,7 +208,7 @@ function getObjectsLinksContents(o, turn, art){
 		}
 		if (contents != "nothing" && contents != ""){ // If there are actually contents . . .
 			let stuff = o.getContents()
-			let stuffList = stuff.filter(ob => ob.container).map(ob => getObjectsLinksContents(ob))
+			let stuffList = stuff.filter(ob => ob.container).map(ob => getObjectLinkContents(ob))
 			contents += stuffList;
 		}
 		if (contents != "nothing" && contents != ""){
@@ -236,9 +219,9 @@ function getObjectsLinksContents(o, turn, art){
 }
 
 function getObjectLink(obj, disableAfterTurn=false, addArticle=true){
-	//if isScopeHere is sent true, this is for a room description!
+	//if disableAfterTurn is sent true, this link will deactive with the next room description!
 	if(settings.linksEnabled){
-		var endangered = disableAfterTurn ? "single-turn-link" : ""
+		var endangered = disableAfterTurn ? "endangered-link" : ""
 		var oName = obj.name
 		var id = obj.alias || obj.name;
 		var prefix = "";
@@ -249,22 +232,34 @@ function getObjectLink(obj, disableAfterTurn=false, addArticle=true){
 		if (addArticle) {prefix = dispAlias.replace(obj.alias,'')}
 		disableObjectLink($(`[obj="${oName}"]`))
 		var s = prefix+`<span class="object-link dropdown ${endangered}">`;
-		s +=`<span onclick="toggleDropdown($(this).attr('obj'))" obj="${oName}" class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
+		s +=`<span onclick="toggleDropdown($(this).attr('obj'))" obj="${oName}" `+
+		`class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
 		s += `<span id="${oName}" class="dropdown-content ${endangered}">`;
-		let verbArr = obj.getVerbs()
-		if (verbArr.length>0){
-			verbArr.forEach (o=>{
-				o = capFirst(o)
-				s += `<span class="${endangered} list-link-verb" onclick="$(this).parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
-			})
-		}
-		s += "</span></span>";
+		s += `<span id="${oName}-verbs-list-holder" class="${endangered}">`
+		s += getVerbsLinks(obj, endangered);
+		s += "</span></span></span>";
 		return s;
 	}else{
 		var s = obj.alias || obj.name;
 		return s
 	}
 };
+
+function getVerbsLinks(obj, endangered){
+	let verbArr = obj.getVerbs();
+	let oName = obj.name;
+	let id = obj.alias || obj.name;
+	let s = ``;
+	if (verbArr.length>0){
+		verbArr.forEach (o=>{
+			o = capFirst(o);
+			s += `<span class="${endangered} list-link-verb" `+
+			`onclick="$(this).parent().parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" `+
+			`link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
+		})
+	}
+	return s;
+}
 
 function toggleDropdown(element) {
     $("#"+element+"").toggle();
@@ -281,70 +276,28 @@ function handleObjLnkClick(cmd,el,verb,objAlias){
 	enterButtonPress(cmd)
 }
 
-function updateDropdownVerblists(){
-	//settings.debugItemLinks = true
+function updateAllItemLinkVerbs(){
 	let verbEls = $("[link-verb]")
 	Object.keys(verbEls).forEach(i => {
 		let el = verbEls[i]
-		if(settings.debugItemLinks) {
-			debuglog("verbEls"); 
-			debuglog(typeof(verbEls));
-			debuglog(verbEls);
-			debuglog("verbEls[i]");
-			debuglog(verbEls[i])
-			debuglog("el");
-			debuglog(typeof(el));
-			debuglog(el);
-			debuglog(el[0]);
-			debuglog(typeof(el[0]));
-		}
-		let verb = $(el).attr("link-verb")
-		if(!verb) return
-		if(settings.debugItemLinks) { debuglog("verb:"); debuglog(verb); }
-		let verbOpp = settings.cmdOpps[verb] || null
-		if(!verbOpp) {
-			if(settings.debugItemLinks) {console.log("NO opposite for " + verb)}
-			return
-		}
-		if(settings.debugItemLinks) {console.log("i:");console.log(i);console.log("el:");console.log(el);console.log("verb:");console.log(verb);console.log("verbOpp");console.log(verbOpp);}
 		let objName = $(el).attr("obj")
-		if(settings.debugItemLinks) {console.log("objName:");console.log(objName);console.log("obj:");}
+		if (!objName) return
 		let obj = w[objName]
-		if(settings.debugItemLinks) {console.log(obj);var hr = "=======================================";console.log(hr);console.log("Do the verbs match the getVerbs? . . .");console.log(hr);}
-		if(!obj.getVerbs) return
-		var objGetVerbs = obj.getVerbs()
-	if(settings.debugItemLinks) {console.log("objGetVerbs:");console.log(objGetVerbs);}
-		objGetVerbs.forEach(newVerb => {
-			if(settings.debugItemLinks) {console.log("Checking getVerbs() for " + objName + " . . .");console.log(newVerb);}
-			if (verbOpp != newVerb) return
-			if(settings.debugItemLinks) {console.log("Found one!");console.log(objName + " needs " + verb  + " changed to " + newVerb + "!");}
-			if(!el.parentElement){
-				if(settings.debugItemLinks){ console.log("No element parent element.  QUITTING!");} 
-				return
-			}
-			//Change the verb to its opposite!
-			switchDropdownVerb(el,newVerb,objName)
-			if(settings.debugItemLinks) {console.log("DONE!")}
-			return true
-			
-		})
+		updateItemLinkVerbs(obj)
 	})
 }
 
-function switchDropdownVerb(el, newVerb, objName){
-	if (!objName) {let objName = $(el).attr("obj")}
-	let oldVerb = $(el).attr("link-verb")
-	if (!newVerb) {let newVerb = settings.cmdOpps[oldVerb]}
-	let str = el.parentElement.innerHTML
-	let regexp = new RegExp(oldVerb,'g')
-	let repl = str.replace(regexp,newVerb);
-	el.parentElement.innerHTML = repl
-	$(el).attr("link-verb",newVerb)
-	parser.msg(`Replaced '${oldVerb}' on ${objName} with '${newVerb}'.`)
+function updateItemLinkVerbs(obj){
+	let oName = obj.name;
+	let id = obj.alias || obj.name;
+	let el = $(`#${oName}-verbs-list-holder`);
+	let endangered = el.hasClass("endangered-link") ? "endangered-link" : "";
+	let newVerbsEl = getVerbsLinks(obj, endangered)
+	el.html(newVerbsEl)
 }
 
 function disableExistingObjectLinks(bool=false){
-	//if bool is false, this only disables existing object links printed using the room description function
+	//if bool is false, this only disables existing object links printed using the endangered-link class.
 	//if bool is true, this disables ALL existing object links
 	//parser.msg("running disableExistingObjectLinks!")
 	//Checks that this doesn't remove "good" links.
@@ -354,10 +307,10 @@ function disableExistingObjectLinks(bool=false){
 		$(".dropdown").removeClass("dropdown")
 		$(".dropdown-content").remove()
 	} else {
-		$(".single-turn-link.droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink")
-		$(".single-turn-link.object-link").removeClass("dropdown")
-		$(".single-turn-link.dropdown").removeClass("dropdown")
-		$(".single-turn-link.dropdown-content").remove()
+		$(".endangered-link.droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink")
+		$(".endangered-link.object-link").removeClass("dropdown")
+		$(".endangered-link.dropdown").removeClass("dropdown")
+		$(".endangered-link.dropdown-content").remove()
 	}
 }
 
@@ -368,6 +321,27 @@ function disableObjectLink(el){
 	$(el).removeClass("dropdown")
 	$(`#${objName}`).remove()
 }
+
+
+function capFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+
+function getDisplayAlias(obj,art=INDEFINITE){
+	return lang.getName(obj,{article:art})
+}
+
+
+// NOTE: getAlias is not used by any function in this library.
+function getAlias(obj){
+	return obj.alias || obj.name
+};
+
+
+// END OF FUNCTIONS
+
+
 
 // MOD!!!
 findCmd('Inv').script = function() {
@@ -449,8 +423,9 @@ $("head").append(`<style>
 
 .show {display:block;
 
-.list-link-verb {
-	white-space:nowrap
 }
+.list-link-verb {
+	white-space:nowrap;
 }
 </style>`)
+

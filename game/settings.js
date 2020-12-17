@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.23";
+settings.version = "0.24";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
 settings.ifid = "879d6c2b-1fe5-4c78-b9f5-579de6310ec6";
 settings.serialNumber = "201202";
@@ -173,12 +173,12 @@ settings.thanks = ["<a href='https://textadventures.co.uk/user/view/_O1rjdv47U2x
    <br><br>Thanks to <a href='http://textadventures.co.uk/user/view/15sc1UtrKE_AtrcyYd1vOw/mrangel'>mrangel\
    </a> for all the help with the code!\
    <br><br>For a list of version changes, \
-   <a id='fake-link-1' href='javascript:void(0)' onclick='printVersionChanges();$(this).parent().remove();'>CLICK HERE</a>"]
-   let setNo = ()=>{noArr.push('.nowhere/.nowhere')};setNo()
+   <a id='fake-link-1' href='javascript:void(0)' onclick='printVersionChanges();$(this).parent().remove();'>CLICK HERE</a>"];
+   let setNo = ()=>{noArr.push('.nowhere/.nowhere')};setNo();
 const walkthroughs = {
   a:[
     "u", "u", "open fridge", "get beer", "e", "give lighter to xm", "light cig", "give beer to xan",
   ]
-}
+};
 
 
