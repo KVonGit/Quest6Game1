@@ -24,23 +24,25 @@ settings.subtitle = "<small style='color:gray;cursor:pointer;' onclick='clickedV
 
 settings.iconsFolder = false  // false: turns off the icons in the panes
 
-
+settings.linksEnabled = true
 //========================================
 //Backup setting.files to filesBak variable
 var filesBak = settings.files;
 
 //Add my files to the existing file array
 filesBak = filesBak.concat([
+	"rhfiles/fixes03",
+	"rhfiles/quest5stuff",
 	"rhfiles/mods",
-	"rhfiles/youTubeAPISetup",
+	//"rhfiles/youTubeAPISetup",  // Loaded at the end of page.html
 	"rhfiles/youTubeLib",
+	"rhfiles/objectLinksLib",
 	"rhfiles/rooms",
 	"rhfiles/items",
 	"rhfiles/npcs",
 	"rhfiles/newcmds",
 	"rhfiles/rhTurnscripts",
 	"rhfiles/rhfunctions",
-	"rhfiles/objectLinksLib",
 	"rhfiles/cardGames",
 	"rhfiles/versionChanges"
 ]);
@@ -77,32 +79,6 @@ settings.setup = function(){
 		//Set up my CSS style sheet
 		$('html').append('<link rel="stylesheet" href="' + settings.folder + 'rhfiles/rhstyle.css"/>');
 		
-		
-		//-------------------------------------------------------------------
-		// BUG FIX QJS 0.3 - OPENABLE adding duplicate verbs onto pane items|
-		//-------------------------------------------------------------------
-		
-		OPENABLE_DICTIONARY.close = function(isMultiple, char) {
-		    const tpParams = {char:char, container:this}
-		    if (!this.openable) {
-		      msg(prefix(this, isMultiple) + lang.cannot_close, tpParams);
-		      return false;
-		    }
-		    else if (this.closed) {
-		      msg(prefix(this, isMultiple) + lang.already, {item:this});
-		      return false;
-		    }
-		    //this.hereVerbs = ['Examine', 'Open']; //KV commented out to fix bug.
-		    this.closed = true;
-		    this.closeMsg(isMultiple, tpParams);
-		    if (this.onClose) this.onClose(char)
-		    return true;
-	    };
-		//-----------------------------------------------------------
-		//END OF FIX OPENABLE adding duplicate verbs onto pane items|
-		//-----------------------------------------------------------
-  
-  
 		//======================
 		//Setup scoring
 		
@@ -110,7 +86,6 @@ settings.setup = function(){
 		game.maxScore = 19;
 		
 		//-----------------------
-		
 		
 		//=======================
 		//Make a status bar! (It updates via turnscript.)
@@ -182,7 +157,7 @@ settings.setup = function(){
 			 //}, 8000)
 		//}
 		
-		//cloneObject(w.grocery_sack, game.player.loc)
+		// Clone objects in this code block, if applicable.
 		
 		//parser.debug = true
 		//settings.debugItemLinks = true

@@ -70,5 +70,6 @@ settings.versionChanges = [
 	"0.21: Numerous changes to YouTube functions, to make Save/Load work correctly (or at least to try).",
 	
 	"0.22: Numerous bug fixes.<br><br>Added online check to postLoad on the TV.<br><br>"+
-	"Made item links work for objects in containers and held by npcs."
+	"Made item links work for objects in containers and held by npcs."+
+	"Moved files around again."
 ]

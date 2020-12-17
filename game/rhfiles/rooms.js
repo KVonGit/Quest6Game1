@@ -1,20 +1,6 @@
 "use strict"
 
-//MOD for object links
-DEFAULT_ROOM.description = function() {
-    if (game.dark) {
-      printOrRun(game.player, this, "darkDesc");
-      return true;
-    }
-    if(settings.linksEnabled){
-		disableExistingObjectLinks()
-	}
-    for (let line of settings.roomTemplate) {
-      msg(line);
-    }
-    return true;
-}
-  
+
   
 createRoom("cellar", {
   desc:"The cellar is small, dimly lit, and dingy.{once:  It sure is nice of XanMag to let you and Ralph stay here, though!}",
@@ -80,9 +66,6 @@ createRoom("living_room", {
 	desc: "A tiny living room.",
 	west: new Exit("Kitchen"),
 });
-
-
-
 
 createRoom("inside_the_refrigerator", {
 	desc: "A small fridge, at least it's a side-by-side.",

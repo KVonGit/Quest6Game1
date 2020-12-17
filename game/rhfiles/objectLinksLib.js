@@ -15,16 +15,12 @@
  * IMPORTANT!!!
  * ------------
  * 
- * Make sure you have modifed DEFAULT_ROOM.description and placed the code block in the
- * code so the changes are loaded BEFORE ANY ROOMS ARE CREATED during game load!!!
+ * Make sure you have this loading before any files which create rooms or items! 
  * 
- * Normally, this should go in data.js, above any code that creates any rooms.
- * 
- * Here is the code:
-------------------------------------------------------------------
+ *  */
 
-// CODE BEGINS
 
+//MOD for object links
 DEFAULT_ROOM.description = function() {
     if (game.dark) {
       printOrRun(game.player, this, "darkDesc");
@@ -38,62 +34,9 @@ DEFAULT_ROOM.description = function() {
     }
     return true;
 }
-
-// END OF CODE
-
---------------------------------------------------------------------
- * 
- */
-
-
-
+  
 //============================================================================
 
-
-// Add some CSS settings.
-$("head").append(`<style>
-.droplink{
-	color:blue;
-}
-.droplink:not(.disabled) {
-    /*background-color: #3498DB;
-    color: blue;
-    padding: 16px;
-    font-size: 16px;
-    border: none;*/
-    cursor: pointer;
-}
-
-.droplink:hover:not(.disabled), .droplink:focus:not(.disabled), .exit-link:hover:not(.disabled) {
-    color: blue;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    overflow: auto;
-	border: 1px solid black;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content span {
-    color: black;
-    padding: 6px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown a:hover {background-color: #ddd}
-
-.show {display:block;}
-</style>`)
 
 //Capture clicks for the objects links
 settings.clickEvents = [{one0:`<span>_PLACEHOLDER_</span>`}]
@@ -122,7 +65,15 @@ settings.roomTemplate = [
   "{exitsHere:You can go {exits}.}",
 ]
 
-settings.linksEnabled = true
+// MODDED for item links
+util.listContents = function(situation, modified = true) {
+  let objArr = this.getContents(situation)
+  if (settings.linksEnabled) {
+	  objArr = objArr.map(o => getObjectLink(o,true))
+	  debuglog(objArr)
+  }
+  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name})
+}
 
 
 // Make it easy to find a command's opposite
@@ -177,6 +128,8 @@ tp.text_processors.objectsLinks = function(arr, params, bool) {
 tp.text_processors.objectLink = function(obj, params) {
 	return getObjectLink(w[obj[0]],false,false)
 }
+
+
 
 //=================================
 // END OF TEXT PROCESSOR ADDITIONS |
@@ -425,3 +378,49 @@ findCmd('Inv').script = function() {
       msg(s);
     }
   }
+
+
+// Add some CSS settings.
+$("head").append(`<style>
+.droplink{
+	color:blue;
+}
+.droplink:not(.disabled) {
+    /*background-color: #3498DB;
+    color: blue;
+    padding: 16px;
+    font-size: 16px;
+    border: none;*/
+    cursor: pointer;
+}
+
+.droplink:hover:not(.disabled), .droplink:focus:not(.disabled), .exit-link:hover:not(.disabled) {
+    color: blue;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    overflow: auto;
+	border: 1px solid black;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content span {
+    color: black;
+    padding: 6px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {background-color: #ddd}
+
+.show {display:block;}
+</style>`)
