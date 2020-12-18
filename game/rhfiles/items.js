@@ -1,7 +1,8 @@
 "use strict"
 
 createItem("table", SURFACE(), {
-	loc:"cellar"
+	loc:"cellar",
+	examine:"FUCKER"
 })
 
 createItem("box", TAKEABLE(), CONTAINER(true), {

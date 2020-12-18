@@ -7,9 +7,9 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.24";
+settings.version = "0.26";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
-settings.ifid = "879d6c2b-1fe5-4c78-b9f5-579de6310ec6";
+settings.ifid = "879D6C2b-1FE5-4C78-B9F5-579DE6310EC6";
 settings.serialNumber = "201202";
 settings.genre = "Absurdist Fiction";
 settings.firstPublished = "2020-12-12";
@@ -36,7 +36,7 @@ filesBak = filesBak.concat([
 	"rhfiles/mods",
 	//"rhfiles/youTubeAPISetup",  // Loaded at the end of page.html
 	"rhfiles/youTubeLib",
-	"rhfiles/objectLinksLib",
+	"rhfiles/item_links",
 	"rhfiles/rooms",
 	"rhfiles/items",
 	"rhfiles/npcs",

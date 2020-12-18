@@ -60,6 +60,14 @@ function upArrowButtonPress(){
 };
 
 
+function clickedCmdLink(s){
+	if (s) {
+		if (io.savedCommands[io.savedCommands.length - 1] !== s) {
+		  io.savedCommands.push(s);
+		}
+		io.savedCommandsPos = io.savedCommands.length;
+	}
+}
 
 
 

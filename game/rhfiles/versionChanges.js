@@ -76,5 +76,12 @@ settings.versionChanges = [
 	"0.23: Tweaked objects list stuff.<br><br>Began adding semicolons to my JS.<br><br>"+
 	"Switched from turnscript to <code>io.modulesToUpdate</code> to update item-links' verbs.  (Thanks to Pixie!)",
 	
-	"0.24: Major changes to item links verbs update system.  Fixed CSS for verbs drop downs (again)."
+	"0.24: Major changes to item links verbs update system.  Fixed CSS for verbs drop downs (again).",
+	
+	"0.25: Renamed 'object link' stuff to 'item link' motif.  Renamed file to match Pixie's filename.<br><br>"+
+	"Capitalized letters in IFID.<br><br>"+
+	"Modified 'nm' text processor function to return link if settings.linksEnabled is true.<br><br>"+
+	"Made link disabling work differently.  Now it checks the scope of things.",
+	
+	"0.26: Corrected my mistake in the mod of tp.text_processors.nm."
 ];
