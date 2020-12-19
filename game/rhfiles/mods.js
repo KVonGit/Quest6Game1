@@ -2,6 +2,7 @@
 	
 lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
 
+
 findCmd("MetaCredits").script = function(){lang.aboutScript()};
 lang.aboutScript = function() {
 	let s = "{b:{param:settings:title}}<br/>"+

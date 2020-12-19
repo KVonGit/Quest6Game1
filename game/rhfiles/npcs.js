@@ -2,7 +2,10 @@
 
 createItem("Ralph", NPC(false), {
   loc:"cellar",
-  examine:"Your trusty sidekick.",
+  examine: (...params) => {
+	  msg("Your trusty sidekick.");
+	  handleExamineHolder(params);
+  },
   regex: /^(R|r)alph$/,
   parserAltNames:["ralph","rp"],
   shadowingPlayer:true,
@@ -69,7 +72,10 @@ createItem("XanMag", NPC(false), {
 	Currently his focus is on \
 	{random:scouring through the forum posts.:fiddling with his iPhone.:flipping between browser tabs.\
 	:listening to music streaming out of his laptop.:the enthralling daydream he is having.}",
-	examine:()=>{msg(processText("{once:"+w.XanMag.examineFirst+"}{notOnce:"+w.XanMag.examineDefault+"}"))},
+	examine:(...params)=>{
+		msg(processText("{once:"+w.XanMag.examineFirst+"}{notOnce:"+w.XanMag.examineDefault+"}"));
+		handleExamineHolder(params);
+	},
 	regex:/^(xm|xanmag|kevin)$/,
 	properName:true,
 	parserAltNames:["xm","kevin"],

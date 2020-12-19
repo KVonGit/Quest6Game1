@@ -2,12 +2,33 @@
 
 createItem("table", SURFACE(), {
 	loc:"cellar",
-	examine:"FUCKER"
+	examine:(...params)=>{
+		msg("A wooden table.");
+		handleExamineHolder(params)
+	}
 })
+
+createItem("Grue_Bot_5000", NPC(false), SURFACE(), CONTAINER(), TAKEABLE(), SWITCHABLE(), {
+	loc:"table"
+})
+
+
+//findCmd("LookAt").script1 = findCmd("LookAt").script;
+//findCmd("LookAt").script = function(objects,matches){
+	//log("RUNNING")
+	//log(objects)
+	//log(matches)
+	//findCmd("LookAt").script1(objects, matches)
+	//return // Else this creates an infinite loop!
+//}
 
 createItem("box", TAKEABLE(), CONTAINER(true), {
 	loc:"table",
-	closed:false
+	closed:false,
+	examine:(...params)=>{
+		msg("A cardboard box, currently {if:box:closed:closed:open}.");
+		handleExamineHolder(params)
+	}
 })
 
 createItem("doohickey", TAKEABLE(), {

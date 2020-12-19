@@ -117,6 +117,80 @@ world.enterRoomAfterScripts =function() {
 //END of FOLLOWING fix
 //---------------------
 
+lang.conjugations.it = [
+      { name:"be", value:"is"},
+      { name:"is", value:"is"}, // Added by KV
+      { name:"have", value:"has"},
+      { name:"can", value:"can"},
+      { name:"mould", value:"moulds"},
+      { name:"*ould", value:"ould"},
+      { name:"must", value:"must"},
+      { name:"don't", value:"doesn't"},
+      { name:"can't", value:"can't"},
+      { name:"won't", value:"won't"},
+      { name:"cannot", value:"cannot"},
+      { name:"@n't", value:"n't"},
+      { name:"'ve", value:"'s"},
+      { name:"'be", value:"'s"},
+      { name:"*ay", value:"ays"},
+      { name:"*uy", value:"uys"},
+      { name:"*oy", value:"oys"},
+      { name:"*ey", value:"eys"},
+      { name:"*y", value:"ies"},
+      { name:"*ss", value:"sses"},
+      { name:"*s", value:"sses"},
+      { name:"*sh", value:"shes"},
+      { name:"*ch", value:"ches"},
+      { name:"*o", value:"oes"},
+      { name:"*x", value:"xes"},
+      { name:"*z", value:"zes"},
+      { name:"*", value:"s"},
+    ];
+
+  
+function handlePutInContainer(char, objects) {
+  let success = false;
+  const container = objects[1][0];
+  const multiple = objects[0].length > 1 || parser.currentCommand.all;
+  const tpParams = {char:char, container:container}
+  if (!container.container) {
+    failedmsg(lang.not_container, {char, container}); // Altered by KV
+    return world.FAILED; 
+  }
+  if (container.closed) {
+    failedmsg(lang.container_closed, tpParams);
+    return world.FAILED; 
+  }
+  if (!char.canManipulate(objects[0], "put")) {
+    return world.FAILED;
+  }
+  for (let obj of objects[0]) {
+    let flag = true;
+    if (!char.getAgreement("Put/in", obj)) {
+      // The getAgreement should give the response
+      continue;
+    }
+    if (!container.testForRecursion(char, obj)) {
+      flag = false;
+    }
+    if (container.testRestrictions) {
+      flag = container.testRestrictions(obj, char);
+    }
+    if (flag) {
+      if (!obj.isAtLoc(char.name)) {
+        failedmsg(prefix(obj, multiple) + lang.not_carrying, {char:char, item:obj});
+      }
+      else {
+        obj.moveToFrom(container.name, char.name);
+        msg(prefix(obj, multiple) + lang.done_msg);
+        success = true;
+      }
+    }
+  }
+  if (success === world.SUCCESS) char.pause();
+  return success ? world.SUCCESS : world.FAILED;
+}
+
 
 //-------------------------------------------------------------------
 // BUG FIX QJS 0.3 - OPENABLE adding duplicate verbs onto pane items|

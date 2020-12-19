@@ -162,8 +162,6 @@ function onGameLoadYouTubeSetup(){
 */
 
 const youTubeDir = [
-	{dir: "memphisRap", title:"Where Da Cheese At?", id:"C-LBBh0Id5I"},
-	{dir: "memphisRap", title:"Who Run It?", id:"ht7iqxNTaN4"},
 	{dir: "necroDeath", title: "Time Perception",id:"DKPhPz5Hqqc"},
 	{dir: "iFiction", title:"Quest", id:"7vIi0U4rSX4"}, 
 	{dir: "iFiction", title: "INFOCOM_doc", id:"OXNLWy7rwH4"},

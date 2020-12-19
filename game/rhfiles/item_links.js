@@ -20,11 +20,23 @@
  *  */
 
 
-// YOU NEED TO UNCOMMENT THESE IF NOT ALREADY DECLARED!
-//const log = console.log;
-//const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
-//const parserlog = (s) => { if(parser.debug){ log(s)} };
-//const debuginfo = (s) => { console.info(s) };
+
+// Thanks to mrangel for this code!!!
+if (typeof(log) === 'undefined'){
+	Object.defineProperty(this, "log", {value: console.log, writable: false});
+}
+if (typeof(debuglog) === 'undefined') {
+	let tmpFn = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
+	Object.defineProperty(this, "debuglog", {value: tmpFn, writable: false});
+}
+if (typeof(parserlog) === 'undefined') {
+	let tmpFn = (s) => { if(parser.debug){ log(s)} };
+	Object.defineProperty(this, "parserlog", {value: tmpFn, writable: false});
+}
+if (typeof(debuginfo) === 'undefined') {
+	let tmpFn = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ console.info(s)} };
+	Object.defineProperty(this, "debuginfo", {value: tmpFn, writable: false});
+}
 
 
 //============================================================================
@@ -53,7 +65,7 @@ window.onclick = function(event) {
 
 settings.roomTemplate = [
   "{hereDesc}",
-  "{objectsHere:You can see {objectsHereLinks} here.}",
+  "{objectsHere:You can see {itemsHereLinks} here.}",
   "{exitsHere:You can go {exits}.}",
 ]
 
@@ -79,7 +91,7 @@ itemLinks.update = function() {
 // TEXT PROCESSOR ADDITIONS |
 //===========================
 
-tp.text_processors.objectsHereLinks = function(arr, params) {
+tp.text_processors.itemsHereLinks = function(arr, params) {
   // Create listOfOjects array comprised of all objects listed here, with links for the objects.
   let listOfOjects = getItemsLinks(scopeHereListed(),true)
   return listOfOjects.length === 0 ? "" : formatList(listOfOjects, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
@@ -88,11 +100,11 @@ tp.text_processors.objectsHereLinks = function(arr, params) {
 tp.text_processors.itemsLinks = function(arr, params, bool) {
   let objArr = getItemsLinks(arr, bool, false)
   return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
-}
+};
 
 tp.text_processors.itemLink = function(obj, params) {
 	return getItemLink(w[obj[0]],false,false)
-}
+};
 
 
 
@@ -107,31 +119,35 @@ tp.text_processors.itemLink = function(obj, params) {
 
 function getItemLink(obj, disableAfterTurn=false, addArticle=true, capitalise=false){
 	//if disableAfterTurn is sent true, this link will deactive with the next room description!
-	if(settings.linksEnabled){
-		var endangered = disableAfterTurn ? "endangered-link" : ""
-		var oName = obj.name
-		var id = obj.alias || obj.name;
-		id = capitalise ? sentenceCase(id) : id;
-		var prefix = "";
-		if (obj.prefix){
-			prefix = obj.prefix+" ";
-		}
-		var dispAlias = getDisplayAlias(obj)
-		if (addArticle) {prefix = dispAlias.replace(obj.alias,'')}
-		disableItemLink($(`[obj="${oName}"]`))
-		
-		var s = prefix+`<span class="object-link dropdown ${endangered}">`;
-		s +=`<span onclick="toggleDropdown($(this).attr('obj'))" obj="${oName}" `+
-		`class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
-		s += `<span id="${oName}" class="dropdown-content ${endangered}">`;
-		s += `<span id="${oName}-verbs-list-holder" class="${endangered}">`
-		s += getVerbsLinks(obj, endangered);
-		s += `</span></span></span>`;
-		return s;
-	}else{
+	if(!settings.linksEnabled){
 		var s = obj.alias || obj.name;
-		return s
+		return s;
 	}
+	var endangered = disableAfterTurn ? "endangered-link" : "";
+	var oName = obj.name;
+	var id = obj.alias || obj.name;
+	id = capitalise ? sentenceCase(id) : id;
+	var prefix = "";
+	if (obj.prefix){
+		prefix = obj.prefix+" ";
+	}
+	var dispAlias = getDisplayAlias(obj);
+	if (addArticle) {
+		prefix = dispAlias.replace(obj.alias,'');
+	}
+	//disableItemLink($(`[obj="${oName}"]`));
+	
+	var s = prefix+`<span class="object-link dropdown ${endangered}">`; 
+
+	s +=`<span onclick="toggleDropdown($(this).next())" obj="${oName}" `+
+	`class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
+
+	s += `<span id="${oName}" class="dropdown-content ${endangered}">`; // Should I away with these duplicate ids?
+
+	s += `<span id="${oName}-verbs-list-holder" class="${endangered}">`;  // Should I away with these duplicate ids?
+	s += getVerbsLinks(obj, endangered);
+	s += `</span></span></span>`;
+	return s;
 }
 
 function getItemsLinks(arr, turn, art){
@@ -142,7 +158,9 @@ function getItemsLinks(arr, turn, art){
 	  //debuglog(objs)
 	  objs.forEach(o => {
 		oLink = getItemLink(o, turn, art) // Set the object link
+		//debuginfo(o.name);
 		let oLinkAddon = getItemLinkContents(o, turn, art)
+		//debuglog(oLinkAddon);
 		oLink += oLinkAddon
 		objArr.push(oLink)  // Add the object (with link) to the list!
 	  })
@@ -151,7 +169,6 @@ function getItemsLinks(arr, turn, art){
 }
 
 function getItemLinkContents(o, turn, art){
-	// SHOULD THIS CHECK FOR SCENERY?
 	let s = "";
 	let pre = "";
 	if (o.container) {
@@ -171,18 +188,17 @@ function getItemLinkContents(o, turn, art){
 	}
 	if ((o.listContents && !o.closed && o.listContents().length>0) || (!o.listContents && o.npc && o.getContents.length>0)) {  // If open container or npc . . .
 		let contents = "" // Create blank string variable
-		if (o.container){ // If this is a container . . .
-			contents  = o.listContents()  // Get a list of the contents. (I modified util.listContents in mods.js to put out object links)
-		}
-		if (o.npc) { // If this is an npc . . .
-			contents =  o.getHolding().map(x => getItemLink(x, turn, art)) // Set the list of contents, with item links.
-		}
+		contents = listItemContents(o);
 		if (contents != "nothing" && contents != ""){ // If there are actually contents . . .
 			let stuff = o.getContents()
-			let stuffList = stuff.filter(ob => ob.container).map(ob => getItemLinkContents(ob))
+			debuginfo(o.name)
+			debuglog(stuff)
+			let stuffList = stuff.filter(ob => ob.container || ob.npc).map(ob => getItemLinkContents(ob))
 			contents += stuffList;
 		}
 		if (contents != "nothing" && contents != ""){
+			debuginfo(o.name + ": adding contents . . .");
+			//debuglog(contents);
 			s += " (" + pre + contents + ")" // Add the contents to the item link.
 		}
 	}
@@ -208,7 +224,7 @@ function getVerbsLinks(obj, endangered){
 }
 
 function toggleDropdown(element) {
-    $("#"+element+"").toggle();
+    $(element).toggle();
 }
 
  
@@ -300,10 +316,7 @@ function getDisplayAlias(obj,art=INDEFINITE){
 }
 
 
-// NOTE: getAlias is not used by any function in this library.
-function getAlias(obj){
-	return obj.alias || obj.name
-}
+
 
 
 // END OF FUNCTIONS
@@ -358,28 +371,28 @@ findCmd('Inv').script = function() {
 
 
 // MOD!!!
-tp.text_processors.nm = function(arr, params) {
-  const subject = tp.findSubject(arr, params);
-  if (!subject) return false;
-  const opt = {};
-  let article = ''
-  if (arr[1] === 'the') opt.article = DEFINITE;
-  if (arr[1] === 'a') opt.article = INDEFINITE;
-  let count = params[subject.name + '_count'] ? params[subject.name + '_count'] : false
-  if (opt.article === DEFINITE) {
-	article = lang.addDefiniteArticle(subject)
-  }
-  else if (opt.article === INDEFINITE) {
-	article = lang.addIndefiniteArticle(subject, count)
-  }
-  if (params[subject.name + '_count']) opt[subject.name + '_count'] = params[subject.name + '_count']
-  let oName = lang.getName(subject, opt)
-  article = arr[2] === 'true' ? sentenceCase(article) : article;
-  if (settings.linksEnabled){
-	  oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
-  }
-  return article + " " + oName;
-};
+//tp.text_processors.nm = function(arr, params) {
+  //const subject = tp.findSubject(arr, params);
+  //if (!subject) return false;
+  //const opt = {};
+  //let article = ''
+  //if (arr[1] === 'the') opt.article = DEFINITE;
+  //if (arr[1] === 'a') opt.article = INDEFINITE;
+  //let count = params[subject.name + '_count'] ? params[subject.name + '_count'] : false
+  //if (opt.article === DEFINITE) {
+	//article = lang.addDefiniteArticle(subject)
+  //}
+  //else if (opt.article === INDEFINITE) {
+	//article = lang.addIndefiniteArticle(subject, count)
+  //}
+  //if (params[subject.name + '_count']) opt[subject.name + '_count'] = params[subject.name + '_count']
+  //let oName = lang.getName(subject, opt)
+  //article = arr[2] === 'true' ? sentenceCase(article) : article;
+  //if (settings.linksEnabled){
+	  //oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
+  //}
+  //return article + " " + oName;
+//};
 
 // Not hacked yet
 //tp.text_processors.nms = function(arr, params) {

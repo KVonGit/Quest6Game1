@@ -83,5 +83,11 @@ settings.versionChanges = [
 	"Modified 'nm' text processor function to return link if settings.linksEnabled is true.<br><br>"+
 	"Made link disabling work differently.  Now it checks the scope of things.",
 	
-	"0.26: Corrected my mistake in the mod of tp.text_processors.nm."
+	"0.26: Corrected my mistake in the mod of tp.text_processors.nm.",
+	
+	"0.27: Fixed bugs in handlePutInContainer and lang.conjunctions.it.",
+	
+	"0.28: Fixed TV insulting Pertex.",
+	
+	"0.29: "
 ];

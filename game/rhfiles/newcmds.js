@@ -114,6 +114,43 @@ commands.push(new Cmd('Smoke', {
 
 //METACOMMANDS
 
+
+commands.push(new Cmd('MetaGracias', {
+  regex:/^thanks$|^thank you$/,
+  script:function() {
+      msg ("You are very welcome.")
+      return world.SUCCESS_NO_TURNSCRIPTS;
+  },
+}));
+
+commands.push(new Cmd('MetaDance', {
+  regex:/^dance$/,
+  script:function() {
+      msg ("This is not {random:a dancing game:Dance Dance Revolution}.")
+      return world.SUCCESS_NO_TURNSCRIPTS;
+  },
+}));
+
+commands.push(new Cmd('MetaSing', {
+  regex:/^sing$/,
+  script:function() {
+      msg ("This is not {random:a singing game:Rock Band}.")
+      return world.SUCCESS_NO_TURNSCRIPTS;
+  },
+}));
+
+
+commands.push(new Cmd('MetaThink', {
+  regex:/^think|ponder|contemplate$/,
+  script:function() {
+	  let s = "{random:Go ahead{random:, if you think it will help:}.:I'm always thinking.:{i:'Think, think, think!'}<br/><br/>"+
+      "Just like Winnie the Pooh!:Who?  Me?  Or you?:42.:I think I thought you were already thinking thoughts.:Good luck with that!}"
+      msg (s)
+      return world.SUCCESS_NO_TURNSCRIPTS;
+  },
+}));
+
+
 //UPDATED 2020.12.08
 commands.push(new Cmd('MetaRestart', {
   regex:/^restart$/,

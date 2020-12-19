@@ -174,9 +174,55 @@ function allObjectsNamesList(){
 	return Object.keys(w).filter(x => (x !== "game" && typeof(w[x]["eventScript"])!=='function'))
 }
 
+// NOTE: getAlias is not used by any function in this library.
+function getAlias(obj){
+	return obj.alias || obj.name
+}
 
+lang.inside = "inside";
+lang.on_top = "on top";
 
+function handleExamineHolder(params){
+	let obj = parser.currentCommand.objects[0][0]
+	if (!obj) return
+	if (!obj.container && !obj.npc) return
+	if (obj.container) {
+		if (!obj.closed || obj.transparent) {
+			let contents = listItemContents(obj);
+			if (contents == 'nothing') return;
+			//let contents = obj.getContents();
+			//contents = contents.filter(o => !o.scenery)
+			let pre = obj.contentsType === 'surface' ? lang.on_top : lang.inside;
+			pre = sentenceCase(pre)
+			let sv = processText("{pv:pov:see}", {pov:game.player})
+			pre += `, ${sv} `
+			//if (contents.length <= 0){ return; }
+			//contents = settings.linksEnabled ? getItemsLinks(contents) : contents;
+			msg(`${pre}${contents}.`);
+		}
+	} else {
+		let contents =  listItemContents(obj)
+		if (contents == 'nothing') return
+		let pre = processText('{pv:char:be:true} carrying', {char:obj})
+		msg(`${pre} ${contents}.`);
+	}
+}
 
+function listItemContents(obj, modified = true) {
+
+  let objArr = obj.getContents(obj);
+
+  if (settings.linksEnabled) {
+
+	  objArr = objArr.map(o => getItemLink(o,true));
+
+	  //debuglog(objArr)
+
+  }
+
+  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:obj.name});
+
+}
 
 function setPronoun(item){
 	var { subjective : pronoun } = item.pronouns
