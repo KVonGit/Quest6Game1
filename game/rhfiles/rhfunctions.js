@@ -75,54 +75,6 @@ function clickedCmdLink(s){
 //END BUTTON PRESS SIMS |
 //=======================
 
-//lang.getName=function(item, options) {
-    //let alias = item.alias || item.name
-    //if (!options) options = {}
-    ////if (!item.alias) item.alias = item.name
-    //let s = ''
-    //let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
-    //if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
-
-    //if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
-      //s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
-    //}
-
-    //else {    
-      //if (count && count > 1) {
-        //s += lang.toWords(count) + ' '
-      //}
-      //else if (options.article === DEFINITE) {
-        //s += lang.addDefiniteArticle(item)
-      //}
-      //else if (options.article === INDEFINITE) {
-        //s += lang.addIndefiniteArticle(item, count)
-      //}
-      //if (item.getAdjective) {
-        //s += item.getAdjective()
-      //}
-      //if (!count || count === 1) {
-        //s += item.alias
-      //}
-      //else if (item.pluralAlias) {
-        //s += item.pluralAlias
-      //}
-      //else {
-        //s += alias + "s"
-      //}
-      //if (options.possessive) {
-        //if (s.endsWith('s')) {
-          //s += "'"
-        //}
-        //else { 
-          //s += "'s"
-        //}
-      //}
-    //}
-    //s += util.getNameModifiers(item, options)
-
-    //return (options && options.capital ? sentenceCase(s) : s)
-  //}
-
 
 
 //Created to help someone on the forum.
@@ -179,50 +131,7 @@ function getAlias(obj){
 	return obj.alias || obj.name
 }
 
-lang.inside = "inside";
-lang.on_top = "on top";
 
-function handleExamineHolder(params){
-	let obj = parser.currentCommand.objects[0][0]
-	if (!obj) return
-	if (!obj.container && !obj.npc) return
-	if (obj.container) {
-		if (!obj.closed || obj.transparent) {
-			let contents = listItemContents(obj);
-			if (contents == 'nothing') return;
-			//let contents = obj.getContents();
-			//contents = contents.filter(o => !o.scenery)
-			let pre = obj.contentsType === 'surface' ? lang.on_top : lang.inside;
-			pre = sentenceCase(pre)
-			let sv = processText("{pv:pov:see}", {pov:game.player})
-			pre += `, ${sv} `
-			//if (contents.length <= 0){ return; }
-			//contents = settings.linksEnabled ? getItemsLinks(contents) : contents;
-			msg(`${pre}${contents}.`);
-		}
-	} else {
-		let contents =  listItemContents(obj)
-		if (contents == 'nothing') return
-		let pre = processText('{pv:char:be:true} carrying', {char:obj})
-		msg(`${pre} ${contents}.`);
-	}
-}
-
-function listItemContents(obj, modified = true) {
-
-  let objArr = obj.getContents(obj);
-
-  if (settings.linksEnabled) {
-
-	  objArr = objArr.map(o => getItemLink(o,true));
-
-	  //debuglog(objArr)
-
-  }
-
-  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:obj.name});
-
-}
 
 function setPronoun(item){
 	var { subjective : pronoun } = item.pronouns
@@ -260,6 +169,7 @@ function findObjByParser(s){
 	return scr
 }
 
+// Currently unused
 function setUpHelpDialog(){
 	var dia = `<div id="dialog_window_1" class="dialog_window" `+
 	`title="Help" style="display:none;"><p id="page0" style="display:none">Welcome to <i>UI Example</i> help system. Click the buttons at the bottom`+
@@ -296,7 +206,6 @@ function setHelpPageZero(s){
 	$("#page0").text(s)
 }
 
-
 function setHelpPageOne(s){
 	$("#page1").text(s)
 }
@@ -304,12 +213,10 @@ function setHelpPageOne(s){
 function setHelpPageTwo(s){
 	$("#page2").text(s)
 }
+
 function setHelpPageThree(s){
 	$("#page3").text(s)
 }
-
-
-
 
 function toBase64(txt){
 	return btoa(txt)
@@ -338,14 +245,6 @@ function setElAttVal(att,val,newVal){
 }
 
 
-
-function logTest(){
-	log("SAY SOMETHING!")
-	var response = readline()
-	log(response)
-}
-
-
 //function showMenu(title, options, fn) {
   //setTimeout(()=>{$("#input").hide();}, 500)
   //const opts = {article:DEFINITE, capital:true}
@@ -360,6 +259,7 @@ function logTest(){
   //})
 //}
 
+// Unused
 function promptForName(holder="Adventurer") {
   var myName = prompt("Please enter your name", holder)
   if (myName != null) {
@@ -369,16 +269,18 @@ function promptForName(holder="Adventurer") {
 }
 settings.noConnection = false
 
+// For YouTube
 function onlineCheck(){
 	let el = `<image style="display:none;" class="online-check" src="https://i.imgur.com/WUGXS8yb.png" onerror="setNoConnection();"/>`
 	$(el).insertAfter($("#main"))
 }
 
+// For YouTube
 function setNoConnection(){
 	settings.noConnection = true
 	$(".online-check").remove()
 	$("#youtube").remove()
-	log("SYSTEM MESSAGE:\nThere is no internet connection. YouTube functionality has been deactivated.")
+	console.log("SYSTEM MESSAGE:\nThere is no internet connection. YouTube functionality has been deactivated.")
 }
 
 //const isIE = () => {

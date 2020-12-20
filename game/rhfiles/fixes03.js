@@ -83,14 +83,9 @@
     return command;
   };
 
-//------------
-//END OF fix |
-//------------
-
 
 //================================================
 //BUG FIX NPC 'following' agenda issue in QuestJS v0.3
-
 
 world.enterRoomAfterScripts =function() {
     game.room.description();
@@ -114,8 +109,7 @@ world.enterRoomAfterScripts =function() {
     game.room.visited++;
 };
 
-//END of FOLLOWING fix
-//---------------------
+
 
 lang.conjugations.it = [
       { name:"be", value:"is"},
@@ -212,6 +206,3 @@ function handlePutInContainer(char, objects) {
 		    if (this.onClose) this.onClose(char)
 		    return true;
 	    };
-//-----------------------------------------------------------
-//END OF FIX OPENABLE adding duplicate verbs onto pane items|
-//-----------------------------------------------------------

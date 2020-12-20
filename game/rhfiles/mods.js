@@ -2,6 +2,16 @@
 	
 lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
 
+util.nameModifierFunctionForContainer = function(o, list) {
+  //console.log("here")
+  const contents = o.getContents(world.LOOK);
+  //console.log(contents)
+  if (contents.length > 0 && (!o.closed || o.transparent)) {
+    list.push(lang.contentsForData[o.contentsType].prefix + o.listContents(world.LOOK) + lang.contentsForData[o.contentsType].suffix)
+  }
+  console.info("running util.nameModifierFunctionForContainer")
+  console.log(list)
+}
 
 findCmd("MetaCredits").script = function(){lang.aboutScript()};
 lang.aboutScript = function() {
@@ -24,9 +34,6 @@ lang.aboutScript = function() {
 
 //MODIFY 'ABOUT' COMMAND (add 'info' and 'information')
 findCmd("MetaCredits").regexes = [/^info$|^information$|^about$|^credits?$|^version$/];
-
-
-
 
 //Put HELP in an iframe
 findCmd("MetaHelp").script = function(){
@@ -188,8 +195,6 @@ parser.enteredCmdArr = []; //KV added for modded parser functions
     }
   };
  
-
-
 //  KV MODIFIED this function to allow OOPS (and to generally keep histories of commands)
   parser.matchItemsToCmd = function(s, cmd) {
     const res = {cmd:cmd, objectTexts:[], objects:[], matches:[]};
@@ -381,13 +386,10 @@ function getCurrentCmd(){
 	return parser.currentCmd;
 }
 
-
 //KV added this function to make life simple.
-
 function getLastEnteredCmd(){
 	return parser.enteredCmdArr[parser.enteredCmdArr.length-2];
 }
-
 
 
 //END OF MODIFIED FUNCTIONS

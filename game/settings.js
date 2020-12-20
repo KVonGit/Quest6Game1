@@ -1,9 +1,9 @@
 "use strict"
 
-//const log = console.log;
-//const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
-//const parserlog = (s) => { if(parser.debug){ log(s)} };
-//const debuginfo = (s) => { console.info(s) };
+const log = console.log;
+const debuglog = (s) => { if(settings.playMode === 'dev' || settings.playMode === 'meta'){ log(s)} };
+const parserlog = (s) => { if(parser.debug){ log(s)} };
+const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
@@ -162,6 +162,7 @@ settings.setup = function(){
 		//parser.debug = true
 		//settings.debugItemLinks = true
 
+		setupItemLinks();
 };
 
 
@@ -174,7 +175,7 @@ settings.thanks = ["<a href='https://textadventures.co.uk/user/view/_O1rjdv47U2x
    </a> for all the help with the code!\
    <br><br>For a list of version changes, \
    <a id='fake-link-1' href='javascript:void(0)' onclick='printVersionChanges();$(this).parent().remove();'>CLICK HERE</a>"];
-   let setNo = ()=>{noArr.push('.nowhere/.nowhere')};setNo();
+   let setNo = ()=>{noArr.push('nowhere/nowhere')};setNo();
 const walkthroughs = {
   a:[
     "u", "u", "open fridge", "get beer", "e", "give lighter to xm", "light cig", "give beer to xan",
