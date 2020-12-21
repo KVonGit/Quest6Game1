@@ -5,7 +5,13 @@ createItem("table", SURFACE(), {
 	examine:(...params)=>{
 		msg("A wooden table.");
 		handleExamineHolder(params)
-	}
+	},
+	nameModifierFunction: (list) => {
+	  if (w.table.getContents().length>0){
+		  list = []
+		  list.push(getAllChildrenLinksRedux(w.table));
+	  }
+  }
 })
 
 createItem("Grue_Bot_5000", NPC(false), SURFACE(), CONTAINER(), TAKEABLE(), SWITCHABLE(), {

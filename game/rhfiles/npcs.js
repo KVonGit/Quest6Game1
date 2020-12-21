@@ -4,7 +4,7 @@ createItem("Ralph", NPC(false), {
   loc:"cellar",
   examine: (...params) => {
 	  msg("Your trusty sidekick.");
-	  handleExamineHolder(params);
+	  handleExamineHolderRedux(params);
   },
   regex: /^(R|r)alph$/,
   parserAltNames:["ralph","rp"],
@@ -18,7 +18,12 @@ createItem("Ralph", NPC(false), {
   hug:"\"Whoa, whoa, whoa,\" says Ralph.  \"Social distancing!  Remember?!?\"",
   love:"This is not that kind of game!",
   multiple:true,
-  hereVerbs:["Talk to","Hug"]
+  hereVerbs:["Talk to","Hug"],
+  nameModifierFunction: (list) => {
+	  if (w.Ralph.getContents().length>0){
+		  list.push(getAllChildrenLinks(this, {article:INDEFINITE}));
+		 }
+  }
 });
 
 createItem("dead_Ralph", NPC(false),{

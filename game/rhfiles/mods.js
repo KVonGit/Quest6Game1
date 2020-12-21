@@ -2,17 +2,6 @@
 	
 lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
 
-util.nameModifierFunctionForContainer = function(o, list) {
-  //console.log("here")
-  const contents = o.getContents(world.LOOK);
-  //console.log(contents)
-  if (contents.length > 0 && (!o.closed || o.transparent)) {
-    list.push(lang.contentsForData[o.contentsType].prefix + o.listContents(world.LOOK) + lang.contentsForData[o.contentsType].suffix)
-  }
-  console.info("running util.nameModifierFunctionForContainer")
-  console.log(list)
-}
-
 findCmd("MetaCredits").script = function(){lang.aboutScript()};
 lang.aboutScript = function() {
 	let s = "{b:{param:settings:title}}<br/>"+

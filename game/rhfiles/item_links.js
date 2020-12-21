@@ -35,11 +35,11 @@
 
 //===================================
 
-settings.roomTemplate = [
-  "{hereDesc}",
-  "{objectsHere:You can see {itemsHereLinks} here.}",
-  "{exitsHere:You can go {exits}.}",
-];
+//settings.roomTemplate = [
+  //"{hereDesc}",
+  //"{objectsHere:You can see {itemsHereLinks} here.}",
+  //"{exitsHere:You can go {exits}.}",
+//];
 
 
 
@@ -100,8 +100,15 @@ function setupItemLinks(){
 	})
 }
 
-function getDisplayAliasLink(item){
-	let s = lang.addIndefiniteArticle(item) + item.linkAlias;
+function getArticle(item, type){
+	if (!type) return false;
+	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
+}
+
+function getDisplayAliasLink(item, art, cap){
+	
+	
+	let s = getArticle(item, INDEFINITE) + item.linkAlias;
 	s = s.trim();
 	return s;
 }
@@ -126,12 +133,41 @@ function handleExamineHolder(params){
 			pre = sentenceCase(pre);
 			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
 			pre += `, ${subjVerb} `;
+			contents = settings.linksEnabled ? getAllChildrenLinks(obj,{article:INDEFINITE}) : contents;
+			msg(`${pre}${contents}.`);
+		}
+	} else {
+		let contents =  getAllChildrenLinks(obj, {article:INDEFINITE});
+		if (contents == 'nothing') return;
+		let pre = processText('{pv:char:be:true} carrying', {char:obj});
+		contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
+		msg(`${pre} ${contents}.`);
+	}
+}
+
+function handleExamineHolderRedux(params){
+	let obj = parser.currentCommand.objects[0][0];
+	if (!obj) return;
+	if (!canHold(obj)) return;
+	if (obj.container) {
+		if (!obj.closed || obj.transparent) {
+			let contents = obj.getContents();
+			contents = contents.filter(o => !o.scenery)
+			if (contents.length <= 0){
+				return;
+			}
+			let pre = obj.contentsType === 'surface' ? lang.on_top : lang.inside;
+			pre = sentenceCase(pre);
+			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
+			pre += `, ${subjVerb} `;
 			contents = settings.linksEnabled ? getAllChildrenLinks(obj) : contents;
 			msg(`${pre}${contents}.`);
 		}
 	} else {
 		let contents =  getAllChildrenLinks(obj);
-		if (contents == 'nothing') return;
+		contents = contents.trim();
+		if (contents == 'nothing' || contents === '') return;
+		console.log(contents);
 		let pre = processText('{pv:char:be:true} carrying', {char:obj});
 		contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
 		msg(`${pre} ${contents}.`);
@@ -165,6 +201,10 @@ function hasGrandchildren(obj){
 function getDirectChildren(item){
 	if (!item.getContents) return [];
 	return item.getContents(item);
+}
+
+function hasChildren(item){
+	return item.getContents(item).length > 0;
 }
 
 function getAllChildren(item, isRoom=false){
@@ -201,13 +241,25 @@ function getRoomContents(room){
 	return result;
 }
 
-function createChildrenLinkString(arr){
-	let string = '';
+function createChildrenLinkString(arr,options){
+	
+    let string = '';
 	if (arr.length < 1) return string
 	arr.forEach(a => {
         if (a.name) {
 			//console.log(a.name);
-			string += getDisplayAliasLink(a);
+			string += getDisplayAliasLink(a,{article:INDEFINITE});
+			let art = '';
+			let count = options && options[a.name + '_count'] ? options[a.name + '_count'] : false
+		    if (options && !count && options.loc && a.countable) count = a.countAtLoc(options.loc)
+		    if (options && options.article && options.article === DEFINITE) {
+		        art = lang.addDefiniteArticle(a)
+		      }
+		      else if (options && options.article && options.article === INDEFINITE) {
+		        art = lang.addIndefiniteArticle(a, count)
+		      }
+			//string = art + ' ' + string;
+			//string = string.trim();
 			game.tempLinkItem = a;
         } else if (a.length) {
 			//console.log(game.tempLinkItem);
@@ -230,10 +282,10 @@ function createChildrenLinkString(arr){
     return string;
 }
 
-function linkStringer(arr){
+function linkStringer(arr,options){
 	//console.log(arr);
 	let s = "";
-    s = createChildrenLinkString(arr);
+    s = createChildrenLinkString(arr,options);
     let newArr = s.split(':');
     newArr = newArr.filter(el => {
         return el != [];
@@ -244,14 +296,26 @@ function linkStringer(arr){
 
 
 // This works as expect on items, but not rooms. For rooms, getRoomContents(room).
-function getAllChildrenLinks(item){
-	return linkStringer(getAllChildren(item));
+function getAllChildrenLinks(item,options){
+	if (!options) {
+		options = {};
+		options.article = INDEFINITE
+	}
+	return linkStringer(getAllChildren(item), options);
+}
+
+function getAllChildrenLinksRedux(item){
+	let kids = getDirectChildren(item);
+	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
+	return formatList(kids,{lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
 
 function getItemsHereLinks() {
 	let room = w[game.player.loc];
 	let items = getRoomContents(room);
-	return linkStringer(items);
+	let options = {};
+	options.article = INDEFINITE;
+	return linkStringer(items,options);
 }
 
 
@@ -274,8 +338,7 @@ function getItemLink(obj, disableAfterTurn=false, addArticle=true, capitalise=fa
 	if (addArticle) {
 		prefix = dispAlias.replace(obj.alias,'');
 	}
-	//disableItemLink($(`[obj="${oName}"]`));
-	
+	//disableItemLink($(`[obj="${oName}"]`));  // Commented out because fixed duplicate dropdown issue.
 	var s = prefix+`<span class="object-link dropdown ${endangered}">`; 
 
 	s +=`<span onclick="toggleDropdown($(this).next())" obj="${oName}" `+
@@ -358,8 +421,49 @@ function capFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function getDisplayAlias(obj,art=INDEFINITE){
-	return lang.getName(obj,{article:art});
+function getDisplayAlias(item, options) {
+    if (!options) options = {}
+    if (!item.alias) item.alias = item.name
+    let s = ''
+    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
+    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
+
+    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
+      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
+    }
+
+    else {    
+      if (count && count > 1) {
+        s += lang.toWords(count) + ' '
+      }
+      else if (!settings.linksEnabled && options.article === DEFINITE) {
+        s += lang.addDefiniteArticle(item)
+      }
+      else if (!settings.linksEnabled && options.article === INDEFINITE) {
+        s += lang.addIndefiniteArticle(item, count)
+      }
+      if (item.getAdjective) {
+        s += item.getAdjective()
+      }
+      if (!count || count === 1) {
+        s += item.alias
+      }
+      else if (item.pluralAlias) {
+        s += item.pluralAlias
+      }
+      else {
+        s += item.alias + "s"
+      }
+      if (options.possessive) {
+        if (s.endsWith('s')) {
+          s += "'"
+        }
+        else { 
+          s += "'s"
+        }
+      }
+    }
+    return s
 }
 
 
@@ -368,18 +472,8 @@ function getDisplayAlias(obj,art=INDEFINITE){
 
 // MODDED for item links
 util.listContents = function(situation, modified = true) {
-  console.info(`util.listContents running. this`)
-  console.log(this)
-  console.info(` situation: `)
-  console.log(situation)
   let objArr = getAllChildrenLinks(this)
-  //let objArr = this.getContents(situation);
-  //if (settings.linksEnabled) {
-	 // objArr = objArr.map(o => getItemLink(o));
-	  //debuglog(objArr)
- // }
  return objArr
- // return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:this.name});
 };
 
 // MOD!!!
@@ -392,27 +486,57 @@ findCmd('Inv').script = function() {
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
 
-// MOD!!!
-  // the NPC has already been moved, so npc.loc is the destination
-  lang.npcEnteringMsg = function(npc, origin) {
-    let s = "";
-    let flag = false;
+  lang.getName = (item, options) => {
+    if (!options) options = {}
+    if (!item.alias) item.alias = item.name
+    let s = ''
+    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
+    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
 
-	let npcLink = getItemLink(npc,true)
+    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
+      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
+    }
 
-    if (w[game.player.loc].canViewLocs && w[game.player.loc].canViewLocs.includes(npc.loc)) {
-      // Can the player see the location the NPC enters, from another location?
-      s = w[game.player.loc].canViewPrefix;
-      flag = true;
+    else {    
+      if (count && count > 1) {
+        s += lang.toWords(count) + ' '
+      }
+      else if (!settings.linksEnabled && options.article === DEFINITE) {
+        s += lang.addDefiniteArticle(item)
+      }
+      else if (!settings.linksEnabled && options.article === INDEFINITE) {
+        s += lang.addIndefiniteArticle(item, count)
+      }
+      if (item.getAdjective) {
+        s += item.getAdjective()
+      }
+      if (!count || count === 1) {
+        s += item.alias
+      }
+      else if (item.pluralAlias) {
+        s += item.pluralAlias
+      }
+      else {
+        s += item.alias + "s"
+      }
+      if (options.possessive) {
+        if (s.endsWith('s')) {
+          s += "'"
+        }
+        else { 
+          s += "'s"
+        }
+      }
     }
-    if (flag || npc.inSight()) {
-		
-      s += lang.nounVerb(npc, "enter", !flag).replace(npc.alias,npcLink) + " " + lang.getName(w[npc.loc], {article:DEFINITE});
-      const exit = w[npc.loc].findExit(origin);
-      if (exit) s += " from " + util.niceDirection(exit.dir);
-      s += ".";
-      msg(s);
-    }
+    let art = getArticle(item,options.article)
+    let cap = options && options.capital
+    //log (art)
+    //log (cap)
+   // log (options)
+    if (!item.room) s = getItemLink(item, false, false, cap);
+    s = art + s
+    s += util.getNameModifiers(item, options)
+    return s
   };
 
 // MOD!!!
@@ -434,7 +558,8 @@ tp.text_processors.nm = function(arr, params) {
 	let oName = lang.getName(subject, opt)
 	article = arr[2] === 'true' ? sentenceCase(article) : article;
 	if (settings.linksEnabled){
-	  oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
+	  //oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
+	  oName = lang.getName(subject,{modified:true,article:opt.article})
 	}
 	return article + " " + oName;
 };

@@ -89,5 +89,7 @@ settings.versionChanges = [
 	
 	"0.28: Fixed TV insulting Pertex.",
 	
-	"0.29: Rewriting majority of items_links library (in process)."
+	"0.29: Rewriting majority of items_links library (in process).",
+	
+	"0.30: Still rewriting item_links."
 ];
