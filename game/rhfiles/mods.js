@@ -2,6 +2,8 @@
 	
 lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
 
+findCmd("LookInside").regex = /^(?:x in|x inside|examine in|examine inside|look in|look inside) (.+)$/;
+
 findCmd("MetaCredits").script = function(){lang.aboutScript()};
 lang.aboutScript = function() {
 	let s = "{b:{param:settings:title}}<br/>"+

@@ -186,7 +186,7 @@ const lang = {
 
 
   // CONTAINER, etc.
-  open_successful:"{nv:char:open:true} {nm:container:the}.",
+  open_successful:"{nv:char:open:true} {sb:container}.",
   close_successful:"{nv:char:close:true} {nm:container:the}.",
   lock_successful:"{nv:char:lock:true} {nm:container:the}.",
   unlock_successful:"{nv:char:unlock:true} {nm:container:the}.",
@@ -205,7 +205,7 @@ const lang = {
   try_but_locked:"{nv:char:try:true} the {param:doorName}, but it is locked.",
   container_closed:"{nv:container:be:true} closed.",
   inside_container:"{nv:item:be:true} inside {nm:container:the}.",
-  look_inside:"Inside {nm:container:the} {nv:char:can} see {param:list}.",
+  look_inside:"Inside {sb:container} {nv:char:can} see {param:list}.",
   
   
   // MECHANDISE

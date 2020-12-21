@@ -8,7 +8,7 @@
 //====================
 // for QuestJS v0.3  |
 //====================
-// Version -1        |
+// Version 0.2       |
 //====================
 
 /*
@@ -90,11 +90,10 @@ function setupItemLinks(){
 		if (obj.getVerbs && obj != w.me && obj != w.background && obj.loc != w.nowhere.name){
 			obj.linkAlias = getItemLink(obj,false,false);
 			if (obj.container) {
-				obj.holdingVerb = obj.contentsType === 'surface' ? 'on' : 'in';
-				obj.holdingVerb += ' which you see ';
+				obj.holdingVerb = lang.contentsForData[obj.contentsType].prefix;
 			}
 			if (obj.npc) {
-				obj.holdingVerb = 'carrying ';
+				obj.holdingVerb = lang.carrying + ' ';
 			}
 		}
 	})
@@ -106,8 +105,6 @@ function getArticle(item, type){
 }
 
 function getDisplayAliasLink(item, art, cap){
-	
-	
 	let s = getArticle(item, INDEFINITE) + item.linkAlias;
 	s = s.trim();
 	return s;
@@ -116,6 +113,17 @@ function getDisplayAliasLink(item, art, cap){
 
 lang.inside = "inside";
 lang.on_top = "on top";
+lang.carrying = "carrying";
+lang.contentsForData.surface.prefix = 'on which you see ';
+lang.contentsForData.surface.suffix = '';
+//lang.open_successful = "{nv:char:open:true} {sb:container}.";
+lang.open_successful = "Done.";
+lang.close_successful = "Done.";
+lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
+//lang.look_inside = "Inside {sb:container} {nv:char:can} see {param:list}.";
+lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
+lang.take_successful = "Taken.";
+lang.drop_successful = "Dropped.";
 
 // Used by npcs and containers.  TODO: Learn about name modifiers, because this code may be reinventing the wheel.
 function handleExamineHolder(params){
@@ -133,55 +141,25 @@ function handleExamineHolder(params){
 			pre = sentenceCase(pre);
 			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
 			pre += `, ${subjVerb} `;
-			contents = settings.linksEnabled ? getAllChildrenLinks(obj,{article:INDEFINITE}) : contents;
+			contents = settings.linksEnabled ? getContentsLinkRedux(obj) : contents;
 			msg(`${pre}${contents}.`);
 		}
 	} else {
-		let contents =  getAllChildrenLinks(obj, {article:INDEFINITE});
+		let contents =  getContentsLinkRedux(obj)
 		if (contents == 'nothing') return;
-		let pre = processText('{pv:char:be:true} carrying', {char:obj});
+		let pre = processText('{pv:char:be:true} ' + lang.carrying, {char:obj});
 		contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
 		msg(`${pre} ${contents}.`);
 	}
 }
 
-function handleExamineHolderRedux(params){
-	let obj = parser.currentCommand.objects[0][0];
-	if (!obj) return;
-	if (!canHold(obj)) return;
-	if (obj.container) {
-		if (!obj.closed || obj.transparent) {
-			let contents = obj.getContents();
-			contents = contents.filter(o => !o.scenery)
-			if (contents.length <= 0){
-				return;
-			}
-			let pre = obj.contentsType === 'surface' ? lang.on_top : lang.inside;
-			pre = sentenceCase(pre);
-			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
-			pre += `, ${subjVerb} `;
-			contents = settings.linksEnabled ? getAllChildrenLinks(obj) : contents;
-			msg(`${pre}${contents}.`);
-		}
-	} else {
-		let contents =  getAllChildrenLinks(obj);
-		contents = contents.trim();
-		if (contents == 'nothing' || contents === '') return;
-		console.log(contents);
-		let pre = processText('{pv:char:be:true} carrying', {char:obj});
-		contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
-		msg(`${pre} ${contents}.`);
-	}
-}
-
-// This does not check inside containers.
-function listItemContents(obj, modified = true) {
-  console.info("Running listItemContents");
-  let objArr = obj.getContents(obj);
-  if (settings.linksEnabled) {
-	  objArr = objArr.map(o => getItemLink(o,true));
+function getContentsLinkRedux(o) {
+  let s = '';
+  const contents = o.getContents(world.LOOK);
+  if (contents.length > 0 && (!o.closed || o.transparent)) {
+    s = o.listContents(world.LOOK);
   }
-  return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:modified, nothing:lang.list_nothing, loc:obj.name});
+  return s
 }
 
 function canHold(obj){
@@ -241,6 +219,7 @@ function getRoomContents(room){
 	return result;
 }
 
+// TODO: This needs to go!
 function createChildrenLinkString(arr,options){
 	
     let string = '';
@@ -282,6 +261,7 @@ function createChildrenLinkString(arr,options){
     return string;
 }
 
+// TODO: This needs to go!
 function linkStringer(arr,options){
 	//console.log(arr);
 	let s = "";
@@ -306,7 +286,7 @@ function getAllChildrenLinks(item,options){
 
 function getAllChildrenLinksRedux(item){
 	let kids = getDirectChildren(item);
-	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
+	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE})); // TODO: This needs its own getName function, I think.
 	return formatList(kids,{lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
 
@@ -472,7 +452,7 @@ function getDisplayAlias(item, options) {
 
 // MODDED for item links
 util.listContents = function(situation, modified = true) {
-  let objArr = getAllChildrenLinks(this)
+  let objArr = getAllChildrenLinks(this); // TODO: This needs to work like the name modifier for containers!
  return objArr
 };
 
@@ -486,7 +466,62 @@ findCmd('Inv').script = function() {
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
 
-  lang.getName = (item, options) => {
+lang.getName = (item, options) => {
+    if (!options) options = {}
+    if (!item.alias) item.alias = item.name
+    let s = ''
+    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
+    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
+
+    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
+      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
+      return s;
+    }
+
+    else {    
+      if (count && count > 1) {
+        s += lang.toWords(count) + ' '
+      }
+      else if (!settings.linksEnabled && options.article === DEFINITE) {
+        s += lang.addDefiniteArticle(item)
+      }
+      else if (!settings.linksEnabled && options.article === INDEFINITE) {
+        s += lang.addIndefiniteArticle(item, count)
+      }
+      if (item.getAdjective) {
+        s += item.getAdjective()
+      }
+      if (!count || count === 1) {
+        s += item.alias
+      }
+      else if (item.pluralAlias) {
+        s += item.pluralAlias
+      }
+      else {
+        s += item.alias + "s"
+      }
+      if (options.possessive) {
+        if (s.endsWith('s')) {
+          s += "'"
+        }
+        else { 
+          s += "'s"
+        }
+      }
+    }
+    let art = getArticle(item, options.article);
+    if (!art) art = '';
+    let cap = options && options.capital;
+    //log (art)
+    //log (cap)
+   // log (options)
+    if (!item.room) s = getItemLink(item, false, false, cap);
+    s = art + s;
+    s += util.getNameModifiers(item, options);
+    return s;
+};
+
+lang.getNameNoLink = (item, options) => {
     if (!options) options = {}
     if (!item.alias) item.alias = item.name
     let s = ''
@@ -528,16 +563,10 @@ findCmd('Inv').script = function() {
         }
       }
     }
-    let art = getArticle(item,options.article)
-    let cap = options && options.capital
-    //log (art)
-    //log (cap)
-   // log (options)
-    if (!item.room) s = getItemLink(item, false, false, cap);
-    s = art + s
     s += util.getNameModifiers(item, options)
     return s
-  };
+};
+
 
 // MOD!!!
 tp.text_processors.nm = function(arr, params) {
@@ -559,7 +588,7 @@ tp.text_processors.nm = function(arr, params) {
 	article = arr[2] === 'true' ? sentenceCase(article) : article;
 	if (settings.linksEnabled){
 	  //oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
-	  oName = lang.getName(subject,{modified:true,article:opt.article})
+	  oName = lang.getName(subject,{modified:true})
 	}
 	return article + " " + oName;
 };
@@ -666,12 +695,15 @@ $("head").append(`<style>
 
 .dropdown-content span {
     color: black;
-    padding: 6px;
+    padding: 2px;
     text-decoration: none;
     display: block;
+    border: 1px solid black;
 }
 
-.dropdown a:hover {background-color: #ddd}
+.dropdown  a:hover {background-color: #ddd}
+
+.list-link-verb:hover {background-color: #ddd}
 
 .show {display:block;
 
