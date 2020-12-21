@@ -8,7 +8,7 @@
 //====================
 // for QuestJS v0.3  |
 //====================
-// Version 0.2       |
+// Version 0.3       |
 //====================
 
 /*
@@ -23,13 +23,10 @@
 /**
  * TODO:
  * 
- * 1. The whole process of outputing the contents links string needs to be 
- *    altered.  Per Pixie's advice, I need to set it up so each item
- *    handles its own contents listing.
- * 
- * 2. Most of this code will be unnecessary once I've set this up differently.
- *    Warn people in the comments.
- * 
+ * 1. Per Pixie's advice, I need to set it up so each item
+ *    handles its own contents listing, but I can't figure out how to 
+ *    do that without messing with lang.getName.
+ *  
  * */
 
 
@@ -88,7 +85,6 @@ function setupItemLinks(){
 	let allObjs = allObjects();
 	allObjs.forEach(obj => {
 		if (obj.getVerbs && obj != w.me && obj != w.background && obj.loc != w.nowhere.name){
-			obj.linkAlias = getItemLink(obj,false,false);
 			if (obj.container) {
 				obj.holdingVerb = lang.contentsForData[obj.contentsType].prefix;
 			}
@@ -104,8 +100,14 @@ function getArticle(item, type){
 	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
 }
 
-function getDisplayAliasLink(item, art, cap){
-	let s = getArticle(item, INDEFINITE) + item.linkAlias;
+function getDisplayAliasLink(item, options, cap){
+	let art = false;
+	if (options) art = options.article
+	let article = getArticle(item, art)
+	if (!article) {
+		article = '';
+	}
+	let s = article + getItemLink(item);
 	s = s.trim();
 	return s;
 }
@@ -145,10 +147,10 @@ function handleExamineHolder(params){
 			msg(`${pre}${contents}.`);
 		}
 	} else {
-		let contents =  getContentsLinkRedux(obj)
+		let contents =  getAllChildrenLinksRedux(obj)
 		if (contents == 'nothing') return;
 		let pre = processText('{pv:char:be:true} ' + lang.carrying, {char:obj});
-		contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
+		//contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
 		msg(`${pre} ${contents}.`);
 	}
 }
@@ -157,7 +159,10 @@ function getContentsLinkRedux(o) {
   let s = '';
   const contents = o.getContents(world.LOOK);
   if (contents.length > 0 && (!o.closed || o.transparent)) {
-    s = o.listContents(world.LOOK);
+    if (!o.listContents) {
+		return getAllChildrenLinksRedux(o);
+	}
+	s = o.listContents(world.LOOK);
   }
   return s
 }
@@ -219,40 +224,29 @@ function getRoomContents(room){
 	return result;
 }
 
-// TODO: This needs to go!
+
 function createChildrenLinkString(arr,options){
-	
     let string = '';
 	if (arr.length < 1) return string
 	arr.forEach(a => {
         if (a.name) {
-			//console.log(a.name);
 			string += getDisplayAliasLink(a,{article:INDEFINITE});
 			let art = '';
 			let count = options && options[a.name + '_count'] ? options[a.name + '_count'] : false
 		    if (options && !count && options.loc && a.countable) count = a.countAtLoc(options.loc)
-		    if (options && options.article && options.article === DEFINITE) {
-		        art = lang.addDefiniteArticle(a)
-		      }
-		      else if (options && options.article && options.article === INDEFINITE) {
-		        art = lang.addIndefiniteArticle(a, count)
-		      }
-			//string = art + ' ' + string;
-			//string = string.trim();
 			game.tempLinkItem = a;
         } else if (a.length) {
-			//console.log(game.tempLinkItem);
-			////console.log(a);
 			string += "@";
-			//console.log(game.tempLinkItem.holdingVerb);
 			let verb = game.tempLinkItem.holdingVerb ? game.tempLinkItem.holdingVerb : 'CARRYING';
-			//console.log(verb);
 			if (verb !== 'CARRYING') {
 				string = string.replace(/:@/g, ' (' + verb);
-				//console.log("still going");
 				let s = createChildrenLinkString(a);
 				string += s + '_END_';
 			}
+			string = string.replace(/:_END_/g, '_HOLDER_');
+			string = string.split(":")
+			string = formatList(string, {lastJoiner:"and", doNotSort:true});
+			string = string.replace(/_HOLDER_/g, ':_END_');
         }
         string += ":";
     })
@@ -261,9 +255,8 @@ function createChildrenLinkString(arr,options){
     return string;
 }
 
-// TODO: This needs to go!
+
 function linkStringer(arr,options){
-	//console.log(arr);
 	let s = "";
     s = createChildrenLinkString(arr,options);
     let newArr = s.split(':');
@@ -286,7 +279,7 @@ function getAllChildrenLinks(item,options){
 
 function getAllChildrenLinksRedux(item){
 	let kids = getDirectChildren(item);
-	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE})); // TODO: This needs its own getName function, I think.
+	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
 	return formatList(kids,{lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
 
@@ -299,40 +292,29 @@ function getItemsHereLinks() {
 }
 
 
-function getItemLink(obj, disableAfterTurn=false, addArticle=true, capitalise=false){
-	//if disableAfterTurn is sent true, this link will deactive with the next room description!
+function getItemLink(obj, capitalise=false){
 	if(!settings.linksEnabled){
 		var s = obj.alias || obj.name;
 		return s;
 	}
-	//console.info("getItemLink: " + obj.name);
-	var endangered = disableAfterTurn ? "endangered-link" : "";
 	var oName = obj.name;
 	var id = obj.alias || obj.name;
 	id = capitalise ? sentenceCase(id) : id;
-	var prefix = "";
-	if (obj.prefix){
-		prefix = obj.prefix+" ";
-	}
-	var dispAlias = getDisplayAlias(obj);
-	if (addArticle) {
-		prefix = dispAlias.replace(obj.alias,'');
-	}
-	//disableItemLink($(`[obj="${oName}"]`));  // Commented out because fixed duplicate dropdown issue.
-	var s = prefix+`<span class="object-link dropdown ${endangered}">`; 
+	var dispAlias = lang.getNameOG(obj);
+	var s = `<span class="object-link dropdown">`; 
 
 	s +=`<span onclick="toggleDropdown($(this).next())" obj="${oName}" `+
-	`class="droplink ${endangered}" name="${oName}-link">${id}</span>`;
+	`class="droplink" name="${oName}-link">${id}</span>`;
 
-	s += `<span obj="${oName}" class="dropdown-content ${endangered}">`;
+	s += `<span obj="${oName}" class="dropdown-content">`;
 
-	s += `<span obj="${oName}-verbs-list-holder" class="${endangered}">`;
-	s += getVerbsLinks(obj, endangered);
+	s += `<span obj="${oName}-verbs-list-holder">`;
+	s += getVerbsLinks(obj);
 	s += `</span></span></span>`;
 	return s;
 }
 
-function getVerbsLinks(obj, endangered){
+function getVerbsLinks(obj){
 	let verbArr = obj.getVerbs();
 	let oName = obj.name;
 	let id = obj.alias || obj.name;
@@ -340,7 +322,7 @@ function getVerbsLinks(obj, endangered){
 	if (verbArr.length>0){
 		verbArr.forEach (o=>{
 			o = capFirst(o);
-			s += `<span class="${endangered} list-link-verb" `+
+			s += `<span class="list-link-verb" `+
 			`onclick="$(this).parent().parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" `+
 			`link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
 		})
@@ -354,24 +336,6 @@ function toggleDropdown(element) {
  
 function handleObjLnkClick(cmd,el,verb,objAlias){
 	enterButtonPress(cmd);
-}
-
-function disableExistingItemLinks(bool=false){
-	//if bool is false, this only disables existing object links printed using the endangered-link class.
-	//if bool is true, this disables ALL existing object links
-	//parser.msg("running disableExistingItemLinks!");
-	//Checks that this doesn't remove "good" links.
-	if (bool){
-		$(".droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink");
-		$(".object-link").removeClass("dropdown");
-		$(".dropdown").removeClass("dropdown");
-		$(".dropdown-content").remove();
-	} else {
-		$(".endangered-link.droplink").removeClass("droplink").css("cursor","default").attr("name","dead-droplink");
-		$(".endangered-link.object-link").removeClass("dropdown");
-		$(".endangered-link.dropdown").removeClass("dropdown");
-		$(".endangered-link.dropdown-content").remove();
-	}
 }
 
 function disableItemLink(el){
@@ -401,58 +365,12 @@ function capFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function getDisplayAlias(item, options) {
-    if (!options) options = {}
-    if (!item.alias) item.alias = item.name
-    let s = ''
-    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
-    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
-
-    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
-      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
-    }
-
-    else {    
-      if (count && count > 1) {
-        s += lang.toWords(count) + ' '
-      }
-      else if (!settings.linksEnabled && options.article === DEFINITE) {
-        s += lang.addDefiniteArticle(item)
-      }
-      else if (!settings.linksEnabled && options.article === INDEFINITE) {
-        s += lang.addIndefiniteArticle(item, count)
-      }
-      if (item.getAdjective) {
-        s += item.getAdjective()
-      }
-      if (!count || count === 1) {
-        s += item.alias
-      }
-      else if (item.pluralAlias) {
-        s += item.pluralAlias
-      }
-      else {
-        s += item.alias + "s"
-      }
-      if (options.possessive) {
-        if (s.endsWith('s')) {
-          s += "'"
-        }
-        else { 
-          s += "'s"
-        }
-      }
-    }
-    return s
-}
-
-
 
 // MODS
 
 // MODDED for item links
 util.listContents = function(situation, modified = true) {
-  let objArr = getAllChildrenLinks(this); // TODO: This needs to work like the name modifier for containers!
+  let objArr = getAllChildrenLinks(this);
  return objArr
 };
 
@@ -460,14 +378,17 @@ util.listContents = function(situation, modified = true) {
 findCmd('Inv').script = function() {
   let listOfOjects = game.player.getContents(world.INVENTORY);
   if (settings.linksEnabled) {
-	  listOfOjects = listOfOjects.map(o => getDisplayAliasLink(o))
+	  listOfOjects = listOfOjects.map(o => getDisplayAliasLink(o, {article:INDEFINITE}))
   }
   msg(lang.inventoryPreamble + " " + formatList(listOfOjects, {lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.name}) + ".");
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
 
 lang.getName = (item, options) => {
-    if (!options) options = {}
+    if (!settings.linksEnabled) {
+		return lang.getNameOG(item, options);
+	}
+	if (!options) options = {}
     if (!item.alias) item.alias = item.name
     let s = ''
     let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
@@ -475,7 +396,8 @@ lang.getName = (item, options) => {
 
     if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
       s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
-      return s;
+      s += util.getNameModifiers(item, options); // ADDED by KV
+      return s; // ADDED by KV
     }
 
     else {    
@@ -515,13 +437,14 @@ lang.getName = (item, options) => {
     //log (art)
     //log (cap)
    // log (options)
-    if (!item.room) s = getItemLink(item, false, false, cap);
+    if (!item.room) s = getItemLink(item, cap);
     s = art + s;
     s += util.getNameModifiers(item, options);
     return s;
 };
 
-lang.getNameNoLink = (item, options) => {
+// The original lang.getName
+lang.getNameOG = (item, options) => {
     if (!options) options = {}
     if (!item.alias) item.alias = item.name
     let s = ''
@@ -616,16 +539,16 @@ tp.text_processors.itemsHereLinks = function(arr, params) {
   };
 
 tp.text_processors.itemsLinks = function(arr, params, bool) {
-  alert("tp.text_processors.itemsLinks running!");  // I don't think this is ever invoked.
+  //alert("tp.text_processors.itemsLinks running!");  // I don't think this is ever invoked.
   //console.log(arr)
-  let links = linkStringer(arr);
+  let links = linkStringer(arr); // TODO:  Get rid of the linkStringer
   return links;
   //let objArr = getItemsLinks(arr, bool, false)
   //return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
 };
 
 tp.text_processors.itemLink = function(obj, params) {
-	return getItemLink(w[obj[0]],false,false);
+	return getItemLink(w[obj[0]]);
 };
 
 

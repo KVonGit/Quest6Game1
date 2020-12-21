@@ -91,5 +91,9 @@ settings.versionChanges = [
 	
 	"0.29: Rewriting majority of items_links library (in process).",
 	
-	"0.30: Still rewriting item_links."
+	"0.30: Still rewriting item_links.",
+	
+	"0.31: Still rewriting item_links...",
+	
+	"0.32: Still rewriting item_links.  Fixed bug in <code>createChildrenLinkString</code>."
 ];

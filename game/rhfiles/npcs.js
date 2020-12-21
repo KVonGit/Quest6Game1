@@ -4,7 +4,7 @@ createItem("Ralph", NPC(false), {
   loc:"cellar",
   examine: (...params) => {
 	  msg("Your trusty sidekick.");
-	  handleExamineHolderRedux(params);
+	  handleExamineHolder(params);
   },
   regex: /^(R|r)alph$/,
   parserAltNames:["ralph","rp"],
