@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.33";
+settings.version = "0.34";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
 settings.ifid = "879D6C2b-1FE5-4C78-B9F5-579DE6310EC6";
 settings.serialNumber = "201202";
@@ -70,7 +70,7 @@ settings.intro = "<h1 id='loading-el'>Loading . </h1>"
 
 settings.setup = function(){
 		//Set up my CSS style sheet
-		$('html').append('<link rel="stylesheet" href="' + settings.folder + 'rhfiles/rhstyle.css"/>');
+		//$('html').append('<link rel="stylesheet" href="' + settings.folder + 'rhfiles/rhstyle.css"/>');
 		
 		//======================
 		//Setup scoring

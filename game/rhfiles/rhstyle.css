@@ -310,3 +310,59 @@ th, td {
 	}
 
 }
+
+
+/*
+ * item_links settings
+ * 
+ * */
+
+.droplink{
+	color:blue;
+}
+.droplink:not(.disabled) {
+    /*background-color: #3498DB;
+    color: blue;
+    padding: 16px;
+    font-size: 16px;
+    border: none;*/
+    cursor: pointer;
+}
+
+.droplink:hover:not(.disabled), .droplink:focus:not(.disabled), .exit-link:hover:not(.disabled) {
+    color: blue;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    overflow: auto;
+	border: 1px solid black;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content span {
+    color: black;
+    padding: 2px;
+    text-decoration: none;
+    display: block;
+    border: 1px solid black;
+}
+
+.dropdown  a:hover {background-color: #ddd}
+
+.list-link-verb:hover {background-color: #ddd}
+
+.show {display:block;
+
+}
+.list-link-verb {
+	white-space:nowrap;
+}

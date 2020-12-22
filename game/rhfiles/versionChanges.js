@@ -97,5 +97,8 @@ settings.versionChanges = [
 	
 	"0.32: Still rewriting item_links.  Fixed bug in <code>createChildrenLinkString</code>.",
 	
-	"0.33: item_link library revamp complete.  (Still a few necessary adjustments, though, I'm sure.)"
+	"0.33: item_link library revamp complete.  (Still a few necessary adjustments, though, I'm sure.)",
+	
+	"0.34: Moved CSS stuff for item links back to the CSS file. (This fixed mobile settings.)<br><br>"+
+	"Also modded page.html to include my CSS sheet up front."
 ];

@@ -294,6 +294,10 @@ function hasGrandchildren(obj){
 	return grandparent;
 }
 
+function reportBug(s){
+	let urlLink = `https://github.com/KVonGit/Quest6Game1/issues/new?title=Found%20a%20bug&body=bar`;
+}
+
 //const isIE = () => {
     //const ua = navigator.userAgent;
     //return ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1;
