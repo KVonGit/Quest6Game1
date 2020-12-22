@@ -1,6 +1,20 @@
 "use strict"
 	
 lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
+lang.inside = "inside";
+lang.on_top = "on top";
+lang.carrying = "carrying";
+lang.contentsForData.surface.prefix = 'on which you see ';
+lang.contentsForData.surface.suffix = '';
+//lang.open_successful = "{nv:char:open:true} {sb:container}.";
+lang.open_successful = "Done.";
+lang.close_successful = "Done.";
+lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
+//lang.look_inside = "Inside {sb:container} {nv:char:can} see {param:list}.";
+lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
+lang.take_successful = "Taken.";
+lang.drop_successful = "Dropped.";
+
 
 findCmd("LookInside").regex = /^(?:x in|x inside|examine in|examine inside|look in|look inside) (.+)$/;
 

@@ -9,7 +9,7 @@ createItem("table", SURFACE(), {
 	nameModifierFunction: (list) => {
 	  if (w.table.getContents().length>0){
 		  list = []
-		  list.push(getAllChildrenLinksRedux(w.table));
+		  list.push(getAllChildrenLinks(w.table));
 	  }
   }
 })

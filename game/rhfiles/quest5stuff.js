@@ -20,3 +20,7 @@ function allObjects(){
   return Object.keys(w).filter(x => (x !== "game" && typeof(w[x]["eventScript"])!=='function')).map(x => w[x]);
 };
 
+
+function capFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}

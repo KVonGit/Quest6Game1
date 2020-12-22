@@ -95,5 +95,7 @@ settings.versionChanges = [
 	
 	"0.31: Still rewriting item_links...",
 	
-	"0.32: Still rewriting item_links.  Fixed bug in <code>createChildrenLinkString</code>."
+	"0.32: Still rewriting item_links.  Fixed bug in <code>createChildrenLinkString</code>.",
+	
+	"0.33: item_link library revamp complete.  (Still a few necessary adjustments, though, I'm sure.)"
 ];

@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.32";
+settings.version = "0.33";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
 settings.ifid = "879D6C2b-1FE5-4C78-B9F5-579DE6310EC6";
 settings.serialNumber = "201202";
@@ -62,13 +62,6 @@ settings.oxfordComma = true
 
 
 //==================
-// This is in objectLinksLib.js!
-//
-//settings.roomTemplate = [
-  //"{hereDesc}",
-  //"{objectsHere:You can see {objectsLinks} here.}",
-  //"{exitsHere:You can go {exits}.}",
-//]
 var noArr = settings.libraries
 //====================================================
 
@@ -128,7 +121,7 @@ settings.setup = function(){
 		
 		//-------------------
 		
-		//BUG FIX for QJS 0.3
+		// FIX (because of the way I load my CSS)
 		io.textColour = "white" //FIXES issue with side pane color changing to black during io.disable.
 		
 		setTimeout(()=>{
@@ -143,26 +136,10 @@ settings.setup = function(){
 		
 		onlineCheck()
 
-		//// Stop game if not playing in iframe from play.html!
-		//if(self === top) {
-			//log(top)
-			 //log("NOT IFRAME!");
-			 //msg("You must play the game from play.html!")
-			 //setTimeout(() => {
-				 //clearScreen()
-				 //msg("INVALID ACCESS")
-				 //msg("GAME OVER")
-				 //$("#input").hide()
-				 //io.finish()
-			 //}, 8000)
-		//}
-		
 		// Clone objects in this code block, if applicable.
 		
 		//parser.debug = true
 		//settings.debugItemLinks = true
-
-		setupItemLinks();
 		
 };
 

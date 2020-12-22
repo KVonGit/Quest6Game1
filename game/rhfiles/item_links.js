@@ -1,6 +1,5 @@
 "use strict"
 
-
 //=======================
 // item_links LIB REDUX |
 //=======================
@@ -8,7 +7,7 @@
 //====================
 // for QuestJS v0.3  |
 //====================
-// Version 0.3       |
+// Version 0.4       |
 //====================
 
 /*
@@ -23,25 +22,39 @@
 /**
  * TODO:
  * 
- * 1. Per Pixie's advice, I need to set it up so each item
- *    handles its own contents listing, but I can't figure out how to 
- *    do that without messing with lang.getName.
+ * 1. I need to set it up so each item handles its own contents listing,
+ *    but I can't figure out how to do that without messing with lang.getName.
  *  
  * */
 
+// =======
+
+// lang additions & mods
+// (NOTE: These first three NEED to be set up in settings.js, or any other file which loads before this one.)
+
+
+// New ones NECESSARY for this library!  
+
+//lang.inside = "inside";
+//lang.on_top = "on top";
+//lang.carrying = "carrying";
+
+//-----------------
+
+// My mods.  (Not necessary for the library.)
+//lang.contentsForData.surface.prefix = 'on which you see ';
+//lang.contentsForData.surface.suffix = '';
+//lang.open_successful = "Done.";
+//lang.close_successful = "Done.";
+//lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
+//lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
+//lang.take_successful = "Taken.";
+//lang.drop_successful = "Dropped.";
 
 //===================================
 
-//settings.roomTemplate = [
-  //"{hereDesc}",
-  //"{objectsHere:You can see {itemsHereLinks} here.}",
-  //"{exitsHere:You can go {exits}.}",
-//];
 
-
-
-
-// UPDATE THE VERB LINKS!
+// THIS UPDATES THE VERB LINKS!
 const itemLinks = {};
 io.modulesToUpdate.push(itemLinks);
 itemLinks.update = function() {
@@ -80,21 +93,7 @@ function updateItemLinkVerbs(obj){
 	el.html(newVerbsEl);
 }
 
-// Invoked at the end of settings.setup
-function setupItemLinks(){
-	let allObjs = allObjects();
-	allObjs.forEach(obj => {
-		if (obj.getVerbs && obj != w.me && obj != w.background && obj.loc != w.nowhere.name){
-			if (obj.container) {
-				obj.holdingVerb = lang.contentsForData[obj.contentsType].prefix;
-			}
-			if (obj.npc) {
-				obj.holdingVerb = lang.carrying + ' ';
-			}
-		}
-	})
-}
-
+// Used by getDisplayAliasLink
 function getArticle(item, type){
 	if (!type) return false;
 	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
@@ -112,21 +111,6 @@ function getDisplayAliasLink(item, options, cap){
 	return s;
 }
 
-
-lang.inside = "inside";
-lang.on_top = "on top";
-lang.carrying = "carrying";
-lang.contentsForData.surface.prefix = 'on which you see ';
-lang.contentsForData.surface.suffix = '';
-//lang.open_successful = "{nv:char:open:true} {sb:container}.";
-lang.open_successful = "Done.";
-lang.close_successful = "Done.";
-lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
-//lang.look_inside = "Inside {sb:container} {nv:char:can} see {param:list}.";
-lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
-lang.take_successful = "Taken.";
-lang.drop_successful = "Dropped.";
-
 // Used by npcs and containers.  TODO: Learn about name modifiers, because this code may be reinventing the wheel.
 function handleExamineHolder(params){
 	let obj = parser.currentCommand.objects[0][0];
@@ -143,11 +127,11 @@ function handleExamineHolder(params){
 			pre = sentenceCase(pre);
 			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
 			pre += `, ${subjVerb} `;
-			contents = settings.linksEnabled ? getContentsLinkRedux(obj) : contents;
+			contents = settings.linksEnabled ? getContentsLink(obj) : contents;
 			msg(`${pre}${contents}.`);
 		}
 	} else {
-		let contents =  getAllChildrenLinksRedux(obj)
+		let contents =  getAllChildrenLinks(obj)
 		if (contents == 'nothing') return;
 		let pre = processText('{pv:char:be:true} ' + lang.carrying, {char:obj});
 		//contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
@@ -155,12 +139,12 @@ function handleExamineHolder(params){
 	}
 }
 
-function getContentsLinkRedux(o) {
+function getContentsLink(o) {
   let s = '';
   const contents = o.getContents(world.LOOK);
   if (contents.length > 0 && (!o.closed || o.transparent)) {
     if (!o.listContents) {
-		return getAllChildrenLinksRedux(o);
+		return getAllChildrenLinks(o);
 	}
 	s = o.listContents(world.LOOK);
   }
@@ -169,16 +153,6 @@ function getContentsLinkRedux(o) {
 
 function canHold(obj){
 	return ( obj.container && ( !obj.closed || obj.transparent ) ) || obj.npc;
-}
-
-function hasGrandchildren(obj){
-	let grandparent = false;
-	let kids = obj.getContents(obj);
-	if (!kids) return false;
-	kids.forEach(kid => {
-		if (kid.getContents) grandparent = true;
-	})
-	return grandparent;
 }
 
 function getDirectChildren(item){
@@ -224,73 +198,11 @@ function getRoomContents(room){
 	return result;
 }
 
-
-function createChildrenLinkString(arr,options){
-    let string = '';
-	if (arr.length < 1) return string
-	arr.forEach(a => {
-        if (a.name) {
-			string += getDisplayAliasLink(a,{article:INDEFINITE});
-			let art = '';
-			let count = options && options[a.name + '_count'] ? options[a.name + '_count'] : false
-		    if (options && !count && options.loc && a.countable) count = a.countAtLoc(options.loc)
-			game.tempLinkItem = a;
-        } else if (a.length) {
-			string += "@";
-			let verb = game.tempLinkItem.holdingVerb ? game.tempLinkItem.holdingVerb : 'CARRYING';
-			if (verb !== 'CARRYING') {
-				string = string.replace(/:@/g, ' (' + verb);
-				let s = createChildrenLinkString(a);
-				string += s + '_END_';
-			}
-			string = string.replace(/:_END_/g, '_HOLDER_');
-			string = string.split(":")
-			string = formatList(string, {lastJoiner:"and", doNotSort:true});
-			string = string.replace(/_HOLDER_/g, ':_END_');
-        }
-        string += ":";
-    })
-    string = string.replace(/:@/g, '');
-    string = string.replace(/:_END_/g, ')');
-    return string;
-}
-
-
-function linkStringer(arr,options){
-	let s = "";
-    s = createChildrenLinkString(arr,options);
-    let newArr = s.split(':');
-    newArr = newArr.filter(el => {
-        return el != [];
-    });
-    let realString = formatList(newArr, {doNotSort:true, lastJoiner:'and'});
-    return realString;
-}
-
-
-// This works as expect on items, but not rooms. For rooms, getRoomContents(room).
-function getAllChildrenLinks(item,options){
-	if (!options) {
-		options = {};
-		options.article = INDEFINITE
-	}
-	return linkStringer(getAllChildren(item), options);
-}
-
-function getAllChildrenLinksRedux(item){
+function getAllChildrenLinks(item){
 	let kids = getDirectChildren(item);
 	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
-	return formatList(kids,{lastJoiner:lang.list_and, nothing:lang.list_nothing});
+	return formatList(kids,{doNotSort:true, lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
-
-function getItemsHereLinks() {
-	let room = w[game.player.loc];
-	let items = getRoomContents(room);
-	let options = {};
-	options.article = INDEFINITE;
-	return linkStringer(items,options);
-}
-
 
 function getItemLink(obj, capitalise=false){
 	if(!settings.linksEnabled){
@@ -321,7 +233,7 @@ function getVerbsLinks(obj){
 	let s = ``;
 	if (verbArr.length>0){
 		verbArr.forEach (o=>{
-			o = capFirst(o);
+			o = sentenceCase(o);
 			s += `<span class="list-link-verb" `+
 			`onclick="$(this).parent().parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" `+
 			`link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
@@ -361,12 +273,10 @@ function enterButtonPress(cmd){
 	}
 }
 
-function capFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
-
+//------
 // MODS
+//------
 
 // MODDED for item links
 util.listContents = function(situation, modified = true) {
@@ -384,6 +294,7 @@ findCmd('Inv').script = function() {
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
 
+// MOD!!!
 lang.getName = (item, options) => {
     if (!settings.linksEnabled) {
 		return lang.getNameOG(item, options);
@@ -491,71 +402,9 @@ lang.getNameOG = (item, options) => {
 };
 
 
-// MOD!!!
-tp.text_processors.nm = function(arr, params) {
-	const subject = tp.findSubject(arr, params);
-	if (!subject) return false;
-	const opt = {};
-	let article = ''
-	if (arr[1] === 'the') opt.article = DEFINITE;
-	if (arr[1] === 'a') opt.article = INDEFINITE;
-	let count = params[subject.name + '_count'] ? params[subject.name + '_count'] : false
-	if (opt.article === DEFINITE) {
-		article = lang.addDefiniteArticle(subject)
-	}
-	else if (opt.article === INDEFINITE) {
-		article = lang.addIndefiniteArticle(subject, count)
-	}
-	if (params[subject.name + '_count']) opt[subject.name + '_count'] = params[subject.name + '_count']
-	let oName = lang.getName(subject, opt)
-	article = arr[2] === 'true' ? sentenceCase(article) : article;
-	if (settings.linksEnabled){
-	  //oName = getItemLink(subject,false,false, (!article=='' && arr[2] === 'true'))
-	  oName = lang.getName(subject,{modified:true})
-	}
-	return article + " " + oName;
-};
-
-// Not hacked yet
-//tp.text_processors.nms = function(arr, params) {
-  //const subject = tp.findSubject(arr, params);
-  //if (!subject) return false;
-  //const opt = {possessive:true};
-  //if (arr[1] === 'the') opt.article = DEFINITE;
-  //if (arr[1] === 'a') opt.article = INDEFINITE;
-  //return arr[2] === 'true' ? sentenceCase(lang.getName(subject, opt)) : lang.getName(subject, opt)
-//};
-
-
+//----------------
 // END OF MODS
 //----------------
-
-//===========================
-// TEXT PROCESSOR ADDITIONS |
-//===========================
-
-tp.text_processors.itemsHereLinks = function(arr, params) {
-	return getItemsHereLinks();
-  };
-
-tp.text_processors.itemsLinks = function(arr, params, bool) {
-  //alert("tp.text_processors.itemsLinks running!");  // I don't think this is ever invoked.
-  //console.log(arr)
-  let links = linkStringer(arr); // TODO:  Get rid of the linkStringer
-  return links;
-  //let objArr = getItemsLinks(arr, bool, false)
-  //return formatList(objArr, {article:INDEFINITE, lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.loc});
-};
-
-tp.text_processors.itemLink = function(obj, params) {
-	return getItemLink(w[obj[0]]);
-};
-
-
-
-//==================================
-// END OF TEXT PROCESSOR ADDITIONS |
-//==================================
 
 
 //Capture clicks for the objects links
@@ -573,7 +422,6 @@ window.onclick = function(event) {
 		}
 	}
 }
-
 
 
 /************

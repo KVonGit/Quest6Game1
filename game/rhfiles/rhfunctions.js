@@ -283,6 +283,17 @@ function setNoConnection(){
 	console.log("SYSTEM MESSAGE:\nThere is no internet connection. YouTube functionality has been deactivated.")
 }
 
+// UNUSED
+function hasGrandchildren(obj){
+	let grandparent = false;
+	let kids = obj.getContents(obj);
+	if (!kids) return false;
+	kids.forEach(kid => {
+		if (kid.getContents) grandparent = true;
+	})
+	return grandparent;
+}
+
 //const isIE = () => {
     //const ua = navigator.userAgent;
     //return ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1;
