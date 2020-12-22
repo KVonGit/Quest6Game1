@@ -2,17 +2,18 @@ body{
 	background-color:#143f6b;
 	font-family:  monospace;
 	font-weight:bold;
-	line-height:16px;
-	font-size:16px;
+	/*line-height:16px;*/
+	font-size:1.25em;
 	color:silver;
+	text-shadow:black 1px -8px 13px;
 }
 #game-desc{
 	margin-right:15vw;
 	margin-left:15vw;
 	text-align: center;/*justify;*/
 	/*text-justify: inter-word;*/
-	border:5px solid black;
-	background-color:navy;
+	border:5px solid white;
+	background-color:black;
 	padding:12px;
 	color:silver;
 }
@@ -58,6 +59,6 @@ buttonalt:hover {
 	font-family:  monospace;
 	font-weight:bold;
 	color:silver;
-	line-height:18px;
-	font-size:16px;
+	/*line-height:18px;*/
+	font-size:1.25em;
 }

@@ -100,5 +100,15 @@ settings.versionChanges = [
 	"0.33: item_link library revamp complete.  (Still a few necessary adjustments, though, I'm sure.)",
 	
 	"0.34: Moved CSS stuff for item links back to the CSS file. (This fixed mobile settings.)<br><br>"+
-	"Also modded page.html to include my CSS sheet up front."
+	"Also modded page.html to include my CSS sheet up front.",
+
+	"0.35: Changed image url used to check online connection.<br><br>"+
+	"Fixed the shortcut icon again.  This time I converted it to base64 and put that in the html head element.",
+	
+	"0.36: Adjusted CSS settings on item links and their dropdowns.",
+	
+	"0.37: Fixed issue with inventory command not listing items' contents. (Thanks to Pertex!)<br><br>"+
+	"Changed CSS settings on the landing page.<br><br>"+
+	"Fixed issue with iframes (help and version texts were criss-crossing.  (Thanks again to Pertex!)<br><br>"+
+	"Included the Grue Bot 5000 in TAKE ALL.  (Again, thanks to Pertex!)"
 ];

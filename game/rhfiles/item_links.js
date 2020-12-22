@@ -1,60 +1,57 @@
 "use strict"
 
-//=======================
-// item_links LIB REDUX |
-//=======================
-// by KV             |
-//====================
-// for QuestJS v0.3  |
-//====================
-// Version 0.5       |
-//====================
+/**
+ * @DOC
+ * 
+ * item_links library - REDUX
+ * Version 0.6
+ * 
+ * by KV
+ * 
+ * for QuestJS v0.3
+ *
+ * ## IMPORTANT!!!
+ * 
+ * ### Things the author (this means you) must do before this library will work
+ * 
+ * 1. Make sure you have this file loading before any files which create rooms or items! 
+ * 
+ * 2. lang additions & mods
+ *   (NOTE: These three MUST be set up in settings.js, or any other file which loads before this one.)
+ * 
+ *   New ones NECESSARY for this library!  
+ * 
+ *     lang.inside = "inside";
+ *     lang.on_top = "on top";
+ *     lang.carrying = "carrying";
+ * 
+ * @UNDOC
+ */
 
 /*
- * IMPORTANT!!!
- * ------------
- * 
- * Make sure you have this file loading before any files which create rooms or items! 
- * 
- *  */
-//============================================================================
-
-/**
  * TODO:
  * 
  * 1. I need to set it up so each item handles its own contents listing,
  *    but I can't figure out how to do that without messing with lang.getName.
  *  
- * */
-
-// =======
-
-// lang additions & mods
-// (NOTE: These first three NEED to be set up in settings.js, or any other file which loads before this one.)
+ */
 
 
-// New ones NECESSARY for this library!  
-
-//lang.inside = "inside";
-//lang.on_top = "on top";
-//lang.carrying = "carrying";
-
-//-----------------
-
-// My mods.  (Not necessary for the library.)
-//lang.contentsForData.surface.prefix = 'on which you see ';
-//lang.contentsForData.surface.suffix = '';
-//lang.open_successful = "Done.";
-//lang.close_successful = "Done.";
-//lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
-//lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
-//lang.take_successful = "Taken.";
-//lang.drop_successful = "Dropped.";
-
-//===================================
+/*
+ * My mods.  (Not necessary for the library.)
+ * 
+ * lang.contentsForData.surface.prefix = 'on which you see ';
+ * lang.contentsForData.surface.suffix = '';
+ * lang.open_successful = "Done.";
+ * lang.close_successful = "Done.";
+ * lang.inside_container = "{nv:item:be:true} inside {sb:container}.";
+ * lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
+ * lang.take_successful = "Taken.";
+ * lang.drop_successful = "Dropped.";
+ */
 
 
-// THIS UPDATES THE VERB LINKS!
+// This keeps the verb links updated.
 const itemLinks = {};
 io.modulesToUpdate.push(itemLinks);
 itemLinks.update = function() {
@@ -66,7 +63,6 @@ itemLinks.update = function() {
 	}
 };
 
-// Used by itemLinks
 function updateAllItemLinkVerbs(){
 	let verbEls = $("[link-verb]");
 	Object.keys(verbEls).forEach(i => {
@@ -78,7 +74,6 @@ function updateAllItemLinkVerbs(){
 	})
 }
 
-// Used by updateAllItemLinkVerbs
 function updateItemLinkVerbs(obj){
 	// TODO Check if item is in scope.  If not, disable it!
 	let oName = obj.name;
@@ -93,7 +88,6 @@ function updateItemLinkVerbs(obj){
 	el.html(newVerbsEl);
 }
 
-// Used by getDisplayAliasLink
 function getArticle(item, type){
 	if (!type) return false;
 	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
@@ -111,7 +105,8 @@ function getDisplayAliasLink(item, options, cap){
 	return s;
 }
 
-// Used by npcs and containers.  TODO: Learn about name modifiers, because this code may be reinventing the wheel.
+// Used by npcs and containers.
+// TODO: Learn about name modifiers, because this code may be reinventing the wheel.
 function handleExamineHolder(params){
 	let obj = parser.currentCommand.objects[0][0];
 	if (!obj) return;
@@ -139,6 +134,8 @@ function handleExamineHolder(params){
 	}
 }
 
+// Used for containers. (NPCs use getAllChildrenLinks.)
+// (This should read "getContentsLinks", but I'm not rewriting all the other code to correct it.)
 function getContentsLink(o) {
   let s = '';
   const contents = o.getContents(world.LOOK);
@@ -198,6 +195,7 @@ function getRoomContents(room){
 	return result;
 }
 
+// Used for NPCs. (Containers use getContentsLink.)
 function getAllChildrenLinks(item){
 	let kids = getDirectChildren(item);
 	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
@@ -244,6 +242,10 @@ function getVerbsLinks(obj){
 
 function toggleDropdown(element) {
     $(element).toggle();
+    var disp = $(element).css('display');
+    let newDisp = disp === 'none' ? 'block' : 'block';
+    $(element).css('display', newDisp);
+    
 }
  
 function handleObjLnkClick(cmd,el,verb,objAlias){
@@ -286,13 +288,18 @@ util.listContents = function(situation, modified = true) {
 
 // MOD!!!
 findCmd('Inv').script = function() {
-  let listOfOjects = game.player.getContents(world.INVENTORY);
   if (settings.linksEnabled) {
-	  listOfOjects = listOfOjects.map(o => getDisplayAliasLink(o, {article:INDEFINITE}))
+	  //listOfOjects = listOfOjects.map(o => getDisplayAliasLink(o, {article:INDEFINITE}))
+	  msg(lang.inventoryPreamble + " " + getAllChildrenLinks(game.player) + ".");
+	  return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
   }
+  let listOfOjects = game.player.getContents(world.INVENTORY);
   msg(lang.inventoryPreamble + " " + formatList(listOfOjects, {lastJoiner:lang.list_and, modified:true, nothing:lang.list_nothing, loc:game.player.name}) + ".");
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
+
+// Keep the original getName, but rename it
+lang.getNameOG = lang.getName;
 
 // MOD!!!
 lang.getName = (item, options) => {
@@ -354,53 +361,6 @@ lang.getName = (item, options) => {
     return s;
 };
 
-// The original lang.getName
-lang.getNameOG = (item, options) => {
-    if (!options) options = {}
-    if (!item.alias) item.alias = item.name
-    let s = ''
-    let count = options[item.name + '_count'] ? options[item.name + '_count'] : false
-    if (!count && options.loc && item.countable) count = item.countAtLoc(options.loc)
-
-    if (item.pronouns === lang.pronouns.firstperson || item.pronouns === lang.pronouns.secondperson) {
-      s = options.possessive ? item.pronouns.poss_adj : item.pronouns.subjective;
-    }
-
-    else {    
-      if (count && count > 1) {
-        s += lang.toWords(count) + ' '
-      }
-      else if (!settings.linksEnabled && options.article === DEFINITE) {
-        s += lang.addDefiniteArticle(item)
-      }
-      else if (!settings.linksEnabled && options.article === INDEFINITE) {
-        s += lang.addIndefiniteArticle(item, count)
-      }
-      if (item.getAdjective) {
-        s += item.getAdjective()
-      }
-      if (!count || count === 1) {
-        s += item.alias
-      }
-      else if (item.pluralAlias) {
-        s += item.pluralAlias
-      }
-      else {
-        s += item.alias + "s"
-      }
-      if (options.possessive) {
-        if (s.endsWith('s')) {
-          s += "'"
-        }
-        else { 
-          s += "'s"
-        }
-      }
-    }
-    s += util.getNameModifiers(item, options)
-    return s
-};
-
 
 //----------------
 // END OF MODS
@@ -415,9 +375,9 @@ window.onclick = function(event) {
 	}else{
 		settings.clickEvents.unshift(event.target);
 		if (typeof(settings.clickEvents[1].nextSibling)!=='undefined' &&  settings.clickEvents[1].nextSibling!==null){
-			if (settings.clickEvents[1] !== event.target && settings.clickEvents[1].nextSibling.style.display==="inline" && event.target.matches('.droplink')){
+			if (settings.clickEvents[1] !== event.target && settings.clickEvents[1].nextSibling.style.display==="block" && event.target.matches('.droplink')){
 				$(".dropdown-content").hide();
-				event.target.nextSibling.style.display="inline";
+				event.target.nextSibling.style.display="block";
 			}
 		}
 	}

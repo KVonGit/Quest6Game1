@@ -15,7 +15,12 @@ createItem("table", SURFACE(), {
 })
 
 createItem("Grue_Bot_5000", NPC(false), SURFACE(), CONTAINER(), TAKEABLE(), SWITCHABLE(), {
-	loc:"table"
+	loc:"table",
+	excludeFromAll:false,
+	examine: () => {
+		msg("He's just your typical, every day {nm:item}.", {item:w.Grue_Bot_5000});
+		handleExamineHolder(this);
+	}
 })
 
 

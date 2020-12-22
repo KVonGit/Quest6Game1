@@ -188,7 +188,7 @@ span.compass-button {
 }
 
 
-// Used by showMenu
+/* Used by showMenu */
 .menu-title {
   color: grey;
   font-style: italic;
@@ -286,11 +286,26 @@ th, td {
 	width: 98% !important;
 }
 
+#dialog_window_1  {
+	box-shadow:0 0 2px black;
+	color:black;
+	background:lightgray;
+	padding:8px;
+}
 
-#dialog_window_1  {box-shadow:0 0 2px black;color:black;background:lightgray;padding:8px;}
-.ui-button-text {color:black;}
-.ui-dialog-titlebar {background:black;font-family:monospace;}
+.ui-button-text {
+	color:black;
+}
 
+.ui-dialog-titlebar {
+	background:black;
+	font-family:monospace;
+}
+
+
+.popup { /* Added by KV (incomplete) */
+	display:none;
+}
 
 /* Added by KV for MOBILE */
 @media only screen and (max-width: 956px) {
@@ -318,7 +333,8 @@ th, td {
  * */
 
 .droplink{
-	color:blue;
+  color:blue;
+  font-size: inherit;
 }
 .droplink:not(.disabled) {
     /*background-color: #3498DB;
@@ -327,6 +343,8 @@ th, td {
     font-size: 16px;
     border: none;*/
     cursor: pointer;
+    text-decoration: underline;
+    font-size:inherit;
 }
 
 .droplink:hover:not(.disabled), .droplink:focus:not(.disabled), .exit-link:hover:not(.disabled) {
@@ -356,12 +374,16 @@ th, td {
     border: 1px solid black;
 }
 
-.dropdown  a:hover {background-color: #ddd}
+.dropdown  a:hover {
+	background-color: #ddd;
+}
 
-.list-link-verb:hover {background-color: #ddd}
+.list-link-verb:hover {
+	background-color: #ddd;
+}
 
-.show {display:block;
-
+.show {
+  display:block;
 }
 .list-link-verb {
 	white-space:nowrap;

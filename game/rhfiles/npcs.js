@@ -23,7 +23,9 @@ createItem("Ralph", NPC(false), {
 	  if (w.Ralph.getContents().length>0){
 		  list.push(getAllChildrenLinks(this, {article:INDEFINITE}));
 		 }
-  }
+  },
+  take:"Ralph wouldn't like that.",
+  excludeFromAll:false
 });
 
 createItem("dead_Ralph", NPC(false),{

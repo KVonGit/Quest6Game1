@@ -1,6 +1,7 @@
 "use strict"
 	
-lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {nm:item:the} on.</span>";
+lang.turn_on_successful = "<span class='switchon'>{nv:char:switch:true} {sb:item} on.</span>";
+lang.turn_off_successful = "{nv:char:switch:true} {sb:item} off.";
 lang.inside = "inside";
 lang.on_top = "on top";
 lang.carrying = "carrying";

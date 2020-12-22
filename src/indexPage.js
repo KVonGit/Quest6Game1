@@ -2,7 +2,7 @@
 
 
 
-var desc = "In this small text adventure, you and your trusty sidekick, Ralph, "+
+var desc = "In this small text adventure, you and your trusty sidekick (Ralph) "+
     "need to look around and interact with things (and XanMag) until you figure out what to do."+
     "<br/><br/>It's pretty straightforward.  It's really just to test out the new version of Quest."+
     "<br/><br/><center>(Click on CREDITS at the bottom of this page for more info!)</center>";
