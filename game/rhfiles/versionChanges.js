@@ -113,5 +113,7 @@ settings.versionChanges = [
 	"Included the Grue Bot 5000 in TAKE ALL.  (Again, thanks to Pertex!)",
 	
 	"0.38: Added exit links.<br><br>"+
-	"Made the previously printed item links re-enable when the items are in reach again. (Thanks to Pertex!)"
+	"Made the previously printed item links re-enable when the items are in reach again. (Thanks to Pertex!)",
+	
+	"0.39: Now clicking on a command link prints an echo of the command."
 ];

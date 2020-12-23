@@ -94,7 +94,7 @@ lang.joiner_regex = /\b\, and\b|\,|\band\b/;
 
 //Make clicked commands add to list history (to fix AGAIN cmd)
 io.cmdlink = function(command, str) {
-  return `<a class="cmd-link" onclick="parser.parse('${command}');clickedCmdLink('${command}');">${str}</a>`;
+  return `<a class="cmd-link" onclick="io.msgInputText('${command}'); parser.parse('${command}');clickedCmdLink('${command}');">${str}</a>`;
 };
 
 //Make clicked "exits" add to list history (to fix AGAIN cmd)
