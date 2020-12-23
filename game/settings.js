@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.37";
+settings.version = "0.38";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
 settings.ifid = "879D6C2b-1FE5-4C78-B9F5-579DE6310EC6";
 settings.serialNumber = "201202";

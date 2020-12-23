@@ -110,5 +110,8 @@ settings.versionChanges = [
 	"0.37: Fixed issue with inventory command not listing items' contents. (Thanks to Pertex!)<br><br>"+
 	"Changed CSS settings on the landing page.<br><br>"+
 	"Fixed issue with iframes (help and version texts were criss-crossing.  (Thanks again to Pertex!)<br><br>"+
-	"Included the Grue Bot 5000 in TAKE ALL.  (Again, thanks to Pertex!)"
+	"Included the Grue Bot 5000 in TAKE ALL.  (Again, thanks to Pertex!)",
+	
+	"0.38: Added exit links.<br><br>"+
+	"Made the previously printed item links re-enable when the items are in reach again. (Thanks to Pertex!)"
 ];

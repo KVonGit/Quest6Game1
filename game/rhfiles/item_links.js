@@ -60,6 +60,7 @@ itemLinks.update = function() {
 			console.info("running itemLinks.update() to update verbs . . .");
 		}
 		updateAllItemLinkVerbs();
+		updateExitLinks();
 	}
 };
 
@@ -81,6 +82,7 @@ function updateItemLinkVerbs(obj){
 		disableItemLink($(`[obj="${oName}"]`));
 		return;
 	}
+	enableItemLinks($(`[obj="${oName}"]`));
 	let id = obj.alias || obj.name;
 	let el = $(`[obj='${oName}-verbs-list-holder'`);
 	let endangered = el.hasClass("endangered-link") ? "endangered-link" : "";
@@ -253,11 +255,17 @@ function handleObjLnkClick(cmd,el,verb,objAlias){
 }
 
 function disableItemLink(el){
-	let objName = $(el).attr("obj");
-	$(el).removeClass("droplink").css("cursor","default").attr("name","dead-droplink");
-	$(el).removeClass("dropdown");
-	$(el).removeClass("dropdown");
-	$(`#${objName}`).remove();
+	let type = ''
+	if ($(el).hasClass("dropdown")) type = 'dropdown'
+	if ($(el).hasClass("droplink")) type = 'droplink' 
+	$(el).addClass(`disabled disabled-${type}`).attr("name","dead-droplink").removeClass(type).css('cursor','default');
+}
+
+function enableItemLinks(el){
+	let type = '';
+	if ($(el).hasClass("disabled-dropdown")) type = 'dropdown'
+	if ($(el).hasClass("disabled-droplink")) type = 'droplink'
+	$(el).removeClass("disabled").removeClass(`disabled-${type}`).addClass(type).attr("name",$(el).attr("obj")).css("cursor","pointer");
 }
 
 function enterButtonPress(cmd){
@@ -275,6 +283,25 @@ function enterButtonPress(cmd){
 	}
 }
 
+
+function updateExitLinks(){
+	const exits = util.exitList();
+	let link = $(`.exit-link`);
+	if (link.length > 0){
+		Object.values(link).forEach(el => {
+			let dir = $(el).attr('exit');
+			if (!dir) return
+			let ind = exits.indexOf(dir);
+			if (ind < 0) {
+				$(el).addClass("disabled")
+				el.innerHTML = dir;
+			} else {
+				$(el).removeClass("disabled");
+				el.innerHTML = processText(`{cmd:${dir}}`);
+			}
+		})
+	}
+}
 
 //------
 // MODS
@@ -360,6 +387,12 @@ lang.getName = (item, options) => {
     s += util.getNameModifiers(item, options);
     return s;
 };
+
+// Added exit links.  Added this class to css to underline.
+tp.text_processors.exits = function(arr, params) {
+  const list = util.exitList().map(exit => processText(`<span class="exit-link" exit="${exit}">{cmd:${exit}}</span>`));
+  return formatList(list, {lastJoiner:lang.list_or, nothing:lang.list_nowhere});
+}
 
 
 //----------------

@@ -327,6 +327,11 @@ th, td {
 }
 
 
+.exit-link:not(.disabled) {
+	text-decoration:underline;
+}
+
+
 /*
  * item_links settings
  * 
