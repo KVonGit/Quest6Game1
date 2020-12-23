@@ -1,45 +1,25 @@
 "use strict"
 
-/**
- * @DOC
+/** 
  * 
- * item_links library
- * Version 0.7
+ * @version 0.8
+ * @author {@link https://github.com/KVonGit|KV}
+ * @fileoverview Add hyperlink functionality to {@link https://github.com/ThePix/QuestJS|QuestJS}.
  * 
- * by KV
+ * ---
+ * ###### **NOTE**
  * 
- * for QuestJS v0.3
- *
- * ## IMPORTANT!!!
+ * This library is now included in QuestJS as of QuestJS version 0.4, but the library is not
+ * loaded by default.
  * 
- * ### Things the author (this means you) must do before this library will work
+ * View [the instructions](https://github.com/ThePix/QuestJS/wiki/Hyperlinks "https://github.com/ThePix/QuestJS/wiki/Hyperlinks") on the [QuestJS Wiki](https://github.com/ThePix/QuestJS/wiki).
  * 
- * 1. Make sure you have this file loading before any files which create rooms or items! 
+ * This code is sometimes more up to date than the file which is included in Quest.
  * 
- * 2. lang additions & mods
- *   (NOTE: These three MUST be set up in settings.js, or any other file which loads before this one.)
+ * ---
+ * #### These mods are not necessary, but I like to use them.
  * 
- *   New ones NECESSARY for this library!  
- * 
- *     lang.inside = "inside";
- *     lang.on_top = "on top";
- *     lang.carrying = "carrying";
- * 
- * @UNDOC
- */
-
-/*
- * TODO:
- * 
- * 1. I need to set it up so each item handles its own contents listing,
- *    but I can't figure out how to do that without messing with lang.getName.
- *  
- */
-
-
-/*
- * My mods.  (Not necessary for the library.)
- * 
+ * ```
  * lang.contentsForData.surface.prefix = 'on which you see ';
  * lang.contentsForData.surface.suffix = '';
  * lang.open_successful = "Done.";
@@ -48,10 +28,23 @@
  * lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
  * lang.take_successful = "Taken.";
  * lang.drop_successful = "Dropped.";
+ * ```
  */
 
+ /** 
+  * @namespace
+  * @property {object} settings
+  * @property {boolean} settings.linksEnabled - Enable item links and exit links
+  * @example settings.linksEnabled = true;
+  */
+settings.linksEnabled = true;
 
-// This keeps the verb links updated.
+/**
+ * @namespace
+ * @property {object} itemLinks
+ * @property {function} itemLinks.update - keeps the verb links and exit links updated after each turn.
+ * @see {@link updateAllItemLinkVerbs} & {@link updateExitLinks}
+ */
 const itemLinks = {};
 io.modulesToUpdate.push(itemLinks);
 itemLinks.update = function() {
@@ -64,6 +57,11 @@ itemLinks.update = function() {
 	}
 };
 
+/** 
+ * @function updateAllItemLinkVerbs
+ * @description Updates all verb links in items' dropdown menus
+ * @see {@link updateItemLinkVerbs}
+ */
 function updateAllItemLinkVerbs(){
 	let verbEls = $("[link-verb]");
 	Object.keys(verbEls).forEach(i => {
@@ -75,8 +73,13 @@ function updateAllItemLinkVerbs(){
 	})
 }
 
+/** 
+ * @function updateItemLinkVerbs
+ * @param {object} obj - The in-game item
+ * @description Sets the current available verbs in the item link dropdown menu
+ * @see {@link updateAllItemLinkVerbs} & {@link itemLinks}
+ */
 function updateItemLinkVerbs(obj){
-	// TODO Check if item is in scope.  If not, disable it!
 	let oName = obj.name;
 	if (!obj.scopeStatus) {
 		disableItemLink($(`[obj="${oName}"]`));
@@ -90,11 +93,28 @@ function updateItemLinkVerbs(obj){
 	el.html(newVerbsEl);
 }
 
+/** 
+ * @function getArticle
+ * @description Returns 'a', 'an', or 'the' when type is set to INDEFINITE or DEFINITE.
+ * 
+ * Returns <code>false</code> otherwise.
+ * @param {object} item - The in-game item
+ * @param {number} type - DEFINITE or INDEFINITE
+ * @returns {string} 'a', 'an', or 'the' (or <code>false</code>)
+ * @todo Should this simply <code>return</code> rather than <code>return false</code> if no type is requested?
+ */
 function getArticle(item, type){
 	if (!type) return false;
 	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
 }
 
+/** 
+ * @function getDisplayAliasLink
+ * @param {object} item - The in-game item
+ * @param {object} [options] - Includes options such as 'article' (@see {@link getArticle})
+ * @param {boolean} [cap] - If <code>true</code>, first letter of string will be capitallized
+ * @return {string} - The item's link
+ */
 function getDisplayAliasLink(item, options, cap){
 	let art = false;
 	if (options) art = options.article
@@ -107,8 +127,14 @@ function getDisplayAliasLink(item, options, cap){
 	return s;
 }
 
-// Used by npcs and containers.
-// TODO: Learn about name modifiers, because this code may be reinventing the wheel.
+/**
+ * @function handleExamineHolder
+ * @description Used by npcs and containers to print a list of contents.
+ * 
+ * Must be manually added to an item's <code>nameModifierFunction</code>.
+ * @param {object} params - Actually, this function does nothing with <code>params</code>
+ * @todo Learn about name modifiers, because this code may be reinventing the wheel.
+ */
 function handleExamineHolder(params){
 	let obj = parser.currentCommand.objects[0][0];
 	if (!obj) return;
@@ -131,13 +157,16 @@ function handleExamineHolder(params){
 		let contents =  getAllChildrenLinks(obj)
 		if (contents == 'nothing') return;
 		let pre = processText('{pv:char:be:true} ' + lang.carrying, {char:obj});
-		//contents = formatList(contents,{modified:true,doNotSort:true,lastJoiner:'and'});
 		msg(`${pre} ${contents}.`);
 	}
 }
 
-// Used for containers. (NPCs use getAllChildrenLinks.)
-// (This should read "getContentsLinks", but I'm not rewriting all the other code to correct it.)
+/**
+ * @function getContentsLink
+ * @description Used for containers.  (NPCs use {@link getAllChildrenLinks}.)
+ * @param {object} o - The in-game item
+ * @returns {string} A string, which contains item links of the item's contents
+ */
 function getContentsLink(o) {
   let s = '';
   const contents = o.getContents(world.LOOK);
@@ -150,19 +179,44 @@ function getContentsLink(o) {
   return s
 }
 
+/**
+ * @function canHold
+ * @description Returns true if the item may have contents.
+ * @param {object} obj - The in-game item
+ * @returns {boolean} <code>true</code> if the item is a container, surface, or NPC
+ */
 function canHold(obj){
 	return ( obj.container && ( !obj.closed || obj.transparent ) ) || obj.npc;
 }
 
+/**
+ * @function getDirectChildren
+ * @param {object} item - The in-game item
+ * @description Returns an array of the item's direct children.
+ * 
+ * To return a recursive list, use {@link getAllChildren}.
+ * @returns {array} Array of items
+ */
 function getDirectChildren(item){
 	if (!item.getContents) return [];
 	return item.getContents(item);
 }
 
+/** 
+ * @function hasChildren
+ * @param {object} item - The in-game item
+ * @returns {boolean} <code>true</code> if the item is containing or carrying items.
+ */
 function hasChildren(item){
 	return item.getContents(item).length > 0;
 }
 
+/**
+ * @function getAllChildren
+ * @param {object} item - The in-game item
+ * @param {boolean} [isRoom] - Set to <code>false</code> by default.  If set to <code>true</code>, excludes the player and the player's inventory.
+ * @returns {array} An array of items
+ */
 function getAllChildren(item, isRoom=false){
 	let result = [];
 	let children = getDirectChildren(item);
@@ -172,7 +226,6 @@ function getAllChildren(item, isRoom=false){
 	if (children.length < 1) return [];
 	children.forEach(child => {
 		result.push(child);
-		// Added the check on the next line due to occasional errors.
 		let grandchildren = child.getContents ? child.getContents(child) : [];
 		if (grandchildren.length > 0){
 			result.push(getAllChildren(child));
@@ -181,14 +234,18 @@ function getAllChildren(item, isRoom=false){
 	return result;
 }
 
+/**
+ * @function getRoomContents
+ * @param {object} room - The room item
+ * @returns {array} An array of items in the room
+ * @see {@link getAllChildren}
+ */
 function getRoomContents(room){
 	let result = [];
 	let children = getAllChildren(room, true);
 	if (children.length < 1) return [];
 	children.forEach(child => {
-		//console.log(child);
 		result.push(child);
-		// Added the check on the next line due to occasional errors.
 		let grandchildren = child.getContents ? child.getContents(child) : [];
 		if (grandchildren.length > 0){
 			result.push(getAllChildren(child));
@@ -197,13 +254,26 @@ function getRoomContents(room){
 	return result;
 }
 
-// Used for NPCs. (Containers use getContentsLink.)
+/**
+ * @function getAllChildrenLinks
+ * @description Used for NPCs. (Containers use {@link getContentsLink}.)
+ * @param {object} item - The in-game item
+ * @returns {string} - String to display list of item's contents' links
+ */
 function getAllChildrenLinks(item){
 	let kids = getDirectChildren(item);
 	kids = kids.map(o => lang.getName(o,{modified:true,article:INDEFINITE}));
 	return formatList(kids,{doNotSort:true, lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
 
+/**
+ * @function getItemLink
+ * @description Uses <code>{@link getName}</code> to return a link for the item.
+ * @param {object} obj - The in-game item
+ * @param {string} [id] - Optional display alias.  This parameter is not required.
+ * @param {boolean} [capitalise] - Option to capitalize the first letter in the string.  Not required.  Default is <code>false</code>.
+ * @returns {string} The item's link
+ */
 function getItemLink(obj, id='_DEFAULT_', capitalise=false){
 	if(!settings.linksEnabled){
 		var s = obj.alias || obj.name;
@@ -228,6 +298,13 @@ function getItemLink(obj, id='_DEFAULT_', capitalise=false){
 	return s;
 }
 
+/** 
+ * @function getVerbsLinks
+ * @description Returns a string containing all available verbs for the item.
+ * @param {object} obj - The in-game item
+ * @returns {string} String list of verb links available for the item.
+ * @see {@link getItemLink} 
+ */
 function getVerbsLinks(obj){
 	let verbArr = obj.getVerbs();
 	let oName = obj.name;
@@ -237,13 +314,18 @@ function getVerbsLinks(obj){
 		verbArr.forEach (o=>{
 			o = sentenceCase(o);
 			s += `<span class="list-link-verb" `+
-			`onclick="$(this).parent().parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'),this,'${o}','${id}');" `+
+			`onclick="$(this).parent().parent().toggle();handleObjLnkClick('${o} '+$(this).attr('obj-alias'));" `+
 			`link-verb="${o}" obj-alias="${id}" obj="${oName}">${o}</span>`;
 		})
 	}
 	return s;
 }
 
+/** 
+ * @function toggleDropdown
+ * @param {object} element - The HTML element
+ * @description Toggles the display of the element
+ */
 function toggleDropdown(element) {
     $(element).toggle();
     var disp = $(element).css('display');
@@ -251,11 +333,22 @@ function toggleDropdown(element) {
     $(element).css('display', newDisp);
     
 }
- 
-function handleObjLnkClick(cmd,el,verb,objAlias){
+
+/** 
+ * @function handleObjLnkClick
+ * @description Handles item link actions passed via clicking
+ * @param {string} cmd The command to be parsed
+ * @see {@link enterButtonPress}
+ */
+function handleObjLnkClick(cmd){
 	enterButtonPress(cmd);
 }
 
+/** 
+ * @function disableItemLink
+ * @param {object} el - The item link class to be disabled
+ * @description Disables the item link class. (Used when an item is out of scope.)
+ */
 function disableItemLink(el){
 	let type = ''
 	if ($(el).hasClass("dropdown")) type = 'dropdown'
@@ -263,6 +356,11 @@ function disableItemLink(el){
 	$(el).addClass(`disabled disabled-${type}`).attr("name","dead-droplink").removeClass(type).css('cursor','default');
 }
 
+/** 
+ * @function enableItemLinks
+ * @param {object} el - The item link class to enable
+ * @description Enables the item link class.  (Used when an item is in scope.)
+ */
 function enableItemLinks(el){
 	let type = '';
 	if ($(el).hasClass("disabled-dropdown")) type = 'dropdown'
@@ -270,6 +368,13 @@ function enableItemLinks(el){
 	$(el).removeClass("disabled").removeClass(`disabled-${type}`).addClass(type).attr("name",$(el).attr("obj")).css("cursor","pointer");
 }
 
+/** 
+ * @function enterButtonPress
+ * @param {string} cmd - The player's command (normally 'entered' via click)
+ * @description Inserts the clicked command into the textbox element, then parses as if the player typed it and pressed ENTER.
+ * 
+ * This also pushes the command to <code>io.savedCommands</code> for AGAIN purposes.  (This is exclusive to my game, not a default QuestJS thing!)
+ */
 function enterButtonPress(cmd){
 	//Calling this function with no arg will cause s to default to the text in the textbox.
 	if(cmd) $('#textbox').val(cmd);
@@ -285,7 +390,11 @@ function enterButtonPress(cmd){
 	}
 }
 
-
+/** 
+ * @function updateExitLinks
+ * @description Updates all the exit links, making sure only available exits have enabled links.
+ * @see {@link itemLinks|itemLinks.update}
+ */
 function updateExitLinks(){
 	const exits = util.exitList();
 	let link = $(`.exit-link`);
@@ -309,7 +418,18 @@ function updateExitLinks(){
 // MODS
 //------
 
-// MODDED for item links
+/**
+ * @namespace
+ * @property {object} util
+ * @property {function} util.listContents
+ * @param {object} situation - I'm honestly not sure what this is for. 
+ * @param {boolean} [modified] - Not required.  Set to true by default, to invoke the item's name modifier functions.
+ * @description ##### MODDED to return an array of strings containing item links
+ * 
+ * NOTE: <code>this</code> targets the in-game item
+ * @see {@link getAllChildrenLinks}
+ * @returns	{array} Array of strings of item links
+ */
 util.listContents = function(situation, modified = true) {
   let objArr = getAllChildrenLinks(this);
  return objArr
@@ -318,7 +438,6 @@ util.listContents = function(situation, modified = true) {
 // MOD!!!
 findCmd('Inv').script = function() {
   if (settings.linksEnabled) {
-	  //listOfOjects = listOfOjects.map(o => getDisplayAliasLink(o, {article:INDEFINITE}))
 	  msg(lang.inventoryPreamble + " " + getAllChildrenLinks(game.player) + ".");
 	  return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
   }
@@ -327,10 +446,24 @@ findCmd('Inv').script = function() {
   return settings.lookCountsAsTurn ? world.SUCCESS : world.SUCCESS_NO_TURNSCRIPTS;
 };
 
-// Keep the original getName, but rename it
+/** 
+ * @namespace
+ * @property {object} lang
+ * @property {function} lang.getNameOG - The original <code>lang.getName</code>, with a new name
+ * @param {object} item - The in-game item 
+ * @param {object} options - The options can include indefinite or definite article, possessive, pronoun, count, or pluralAlias.
+ * @returns {string} String with the item's item link or a pronoun with no link
+ */
 lang.getNameOG = lang.getName;
 
-// MOD!!!
+/**
+ * @namespace
+ * @property {object} lang
+ * @property {function} lang.getName - Modified for this library to return an item link.
+ * @param {object} item - The in-game item 
+ * @param {object} [options] - The options can include indefinite or definite article, possessive, pronoun, count, or pluralAlias.
+ * @returns {string} String with the item's item link or a pronoun with no link
+ */
 lang.getName = (item, options) => {
     if (!settings.linksEnabled) {
 		return lang.getNameOG(item, options);
@@ -351,12 +484,6 @@ lang.getName = (item, options) => {
       if (count && count > 1) {
         s += lang.toWords(count) + ' '
       }
-      //else if (!settings.linksEnabled && options.article === DEFINITE) {
-        //s += lang.addDefiniteArticle(item)
-      //}
-      //else if (!settings.linksEnabled && options.article === INDEFINITE) {
-        //s += lang.addIndefiniteArticle(item, count)
-      //}
       if (item.getAdjective) {
         s += item.getAdjective()
       }
@@ -381,16 +508,22 @@ lang.getName = (item, options) => {
     let art = getArticle(item, options.article);
     if (!art) art = '';
     let cap = options && options.capital;
-    //log (art)
-    //log (cap)
-   // log (options)
     if (!item.room) s = getItemLink(item, s, cap);
     s = art + s;
     s += util.getNameModifiers(item, options);
     return s;
 };
 
-// Added exit links.  Added this class to css to underline.
+/**
+ * @namespace
+ * @property {object} tp
+ * @property {array} tp.text_processors
+ * @property {function} tp.text_processors.exits
+ * @description MODIFIED to return a string containing a list of exit links.
+ * @param {array} arr
+ * @param {object} params
+ * @returns A string containing a list of exit links
+ */
 tp.text_processors.exits = function(arr, params) {
   let elClass = settings.linksEnabled ? `-link` : ``;
   const list = [];
@@ -409,7 +542,22 @@ tp.text_processors.exits = function(arr, params) {
 
 
 //Capture clicks for the objects links
+/**
+ * @namespace
+ * @property {object} settings
+ * @property {array} settings.clickEvents
+ * @description Keeps track of clicked events in order to close one dropdown when another dropdown is clicked.
+ */
 settings.clickEvents = [{one0:`<span>_PLACEHOLDER_</span>`}];
+
+/**
+ * @namespace
+ * @property {object} window
+ * @property {function} window.onclick
+ * @param	{object} event
+ * @description Handles item link clicks.
+ * @see {@link clickEvents|settings.clickEvents}
+ */
 window.onclick = function(event) {
 	if (!event.target.matches('.droplink')) {
 		$(".dropdown-content").hide();

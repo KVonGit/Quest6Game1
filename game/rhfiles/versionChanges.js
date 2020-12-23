@@ -117,5 +117,8 @@ settings.versionChanges = [
 	
 	"0.39: Now clicking on a command link prints an echo of the command.",
 	
-	"0.40: Updated item_links library to show what lang.getName puts out.  (I had it a little off.)"
+	"0.40: Updated item_links library to show what lang.getName puts out.  (I had it a little off.)",
+
+	"0.41: Began adding JSDoc comments to the code.<br><br>"+
+	"Fixed bug with Ralph's name modifier.  (Thanks to Pertex!)"
 ];

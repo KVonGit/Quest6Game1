@@ -21,8 +21,11 @@ createItem("Ralph", NPC(false), {
   hereVerbs:["Talk to","Hug"],
   nameModifierFunction: (list) => {
 	  if (w.Ralph.getContents().length>0){
-		  list.push(getAllChildrenLinks(this, {article:INDEFINITE}));
-		 }
+		  list = [];
+		  let s = getAllChildrenLinks(w.Ralph, {article:INDEFINITE});
+		  list.push(s);
+		  //console.log("list:", list);
+	  }
   },
   take:"Ralph wouldn't like that.",
   excludeFromAll:false
