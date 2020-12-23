@@ -3,8 +3,8 @@
 /**
  * @DOC
  * 
- * item_links library - REDUX
- * Version 0.6
+ * item_links library
+ * Version 0.7
  * 
  * by KV
  * 
@@ -204,13 +204,15 @@ function getAllChildrenLinks(item){
 	return formatList(kids,{doNotSort:true, lastJoiner:lang.list_and, nothing:lang.list_nothing});
 }
 
-function getItemLink(obj, capitalise=false){
+function getItemLink(obj, id='_DEFAULT_', capitalise=false){
 	if(!settings.linksEnabled){
 		var s = obj.alias || obj.name;
 		return s;
 	}
 	var oName = obj.name;
-	var id = obj.alias || obj.name;
+	if (id === '_DEFAULT_'){
+		 id = obj.alias || obj.name;
+	}
 	id = capitalise ? sentenceCase(id) : id;
 	var dispAlias = lang.getNameOG(obj);
 	var s = `<span class="object-link dropdown">`; 
@@ -349,12 +351,12 @@ lang.getName = (item, options) => {
       if (count && count > 1) {
         s += lang.toWords(count) + ' '
       }
-      else if (!settings.linksEnabled && options.article === DEFINITE) {
-        s += lang.addDefiniteArticle(item)
-      }
-      else if (!settings.linksEnabled && options.article === INDEFINITE) {
-        s += lang.addIndefiniteArticle(item, count)
-      }
+      //else if (!settings.linksEnabled && options.article === DEFINITE) {
+        //s += lang.addDefiniteArticle(item)
+      //}
+      //else if (!settings.linksEnabled && options.article === INDEFINITE) {
+        //s += lang.addIndefiniteArticle(item, count)
+      //}
       if (item.getAdjective) {
         s += item.getAdjective()
       }
@@ -382,7 +384,7 @@ lang.getName = (item, options) => {
     //log (art)
     //log (cap)
    // log (options)
-    if (!item.room) s = getItemLink(item, cap);
+    if (!item.room) s = getItemLink(item, s, cap);
     s = art + s;
     s += util.getNameModifiers(item, options);
     return s;
@@ -390,7 +392,13 @@ lang.getName = (item, options) => {
 
 // Added exit links.  Added this class to css to underline.
 tp.text_processors.exits = function(arr, params) {
-  const list = util.exitList().map(exit => processText(`<span class="exit-link" exit="${exit}">{cmd:${exit}}</span>`));
+  let elClass = settings.linksEnabled ? `-link` : ``;
+  const list = [];
+  util.exitList().forEach(exit => {
+	  let s = settings.linksEnabled ? `{cmd:${exit}}` : `${exit}`;
+	  let el = processText(`<span class="exit${elClass}" exit="${exit}">${s}</span>`);
+	  list.push(el);
+  })
   return formatList(list, {lastJoiner:lang.list_or, nothing:lang.list_nowhere});
 }
 

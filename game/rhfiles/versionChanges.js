@@ -115,5 +115,7 @@ settings.versionChanges = [
 	"0.38: Added exit links.<br><br>"+
 	"Made the previously printed item links re-enable when the items are in reach again. (Thanks to Pertex!)",
 	
-	"0.39: Now clicking on a command link prints an echo of the command."
+	"0.39: Now clicking on a command link prints an echo of the command.",
+	
+	"0.40: Updated item_links library to show what lang.getName puts out.  (I had it a little off.)"
 ];
