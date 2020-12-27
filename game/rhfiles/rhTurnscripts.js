@@ -14,6 +14,24 @@ createItem("updateStatusBar_Turnscript",
   }
 );
 
+createItem("inTheDark",
+	{
+		eventPeriod:1,
+		eventActive:false,
+		turnsInDark: 0,
+		eventScript: () => {
+			if(game.dark){
+				w.inTheDark.turnsInDark++;
+				msg("It is pitch dark.  You are likely to be eaten by a grue.");
+				if (w.inTheDark.turnsInDark >= 3){
+					eatenByAGrue();
+				}
+			} else {
+				w.inTheDark.turnsInDark = 0;
+			}
+		}
+	}
+)
 
 createItem("spreaderEvent",
   {

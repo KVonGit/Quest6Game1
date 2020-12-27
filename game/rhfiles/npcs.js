@@ -3,8 +3,18 @@
 createItem("Ralph", NPC(false), {
   loc:"cellar",
   examine: (...params) => {
-	  msg("Your trusty sidekick.");
-	  handleExamineHolder(params);
+	let cmd = parser.currentCommand;
+	let examinee = cmd.cmd.name.startsWith("Npc") ?cmd.objects[1][0] : cmd.objects[0][0];
+	let [ /*undefined*/, examiner ] = params;
+	let cmdString = cmd.cmdString;
+	let s = "Your trusty sidekick";
+	if (examiner.npc) {
+		let pre = processText("{nv:pov:examine}", {pov:examiner}) + ' ' + getDisplayAliasLink(examinee, {article:DEFINITE}) + '.';
+		msg(pre);
+		s = `"${s}," ` + processText("{nv:pov:say}.", {pov:examiner});
+	}
+	msg(s);
+	handleExamineHolder({examiner:examiner, examinee:examinee, cmdString:cmdString});
   },
   regex: /^(R|r)alph$/,
   parserAltNames:["ralph","rp"],
@@ -19,14 +29,6 @@ createItem("Ralph", NPC(false), {
   love:"This is not that kind of game!",
   multiple:true,
   hereVerbs:["Talk to","Hug"],
-  nameModifierFunction: (list) => {
-	  if (w.Ralph.getContents().length>0){
-		  list = [];
-		  let s = getAllChildrenLinks(w.Ralph, {article:INDEFINITE});
-		  list.push(s);
-		  //console.log("list:", list);
-	  }
-  },
   take:"Ralph wouldn't like that.",
   excludeFromAll:false
 });
@@ -74,21 +76,30 @@ createItem("XanMag", NPC(false), {
 	activities as you would expect an over-caffeinated teenager with A.D.D. would despite \
 	the fact that he is not over-caffeinated, not a teenager, and has never been diagnosed \
 	as having attention deficit disorder.  Currently he \
-	{random:is scouring through the forum posts.:is fiddling with his iPhone."+
+	{random:is scouring through the forum posts:is fiddling with his iPhone"+
 	//":is taking a long 'sip' from his fancy beer."+
 	":is flipping between browser tabs.:is listening to music \
-	streaming out of his laptop.:appears to be daydreaming.}",
+	streaming out of his laptop:appears to be daydreaming}",
 	examineDefault:"XanMag is easily distracted by all the stimuli around him.  \
 	Currently his focus is on \
-	{random:scouring through the forum posts.:fiddling with his iPhone.:flipping between browser tabs.\
-	:listening to music streaming out of his laptop.:the enthralling daydream he is having.}",
+	{random:scouring through the forum posts:fiddling with his iPhone:flipping between browser tabs\
+	:listening to music streaming out of his laptop:the enthralling daydream he is having}",
 	examine:(...params)=>{
-		msg(processText("{once:"+w.XanMag.examineFirst+"}{notOnce:"+w.XanMag.examineDefault+"}"));
-		handleExamineHolder(params);
+		let cmd = parser.currentCommand;
+		let examinee = cmd.cmd.name.startsWith("Npc") ?cmd.objects[1][0] : cmd.objects[0][0];
+		let [ /*undefined*/, examiner ] = params;
+		let cmdString = cmd.cmdString;
+		let s = processText("{once:" + examinee.examineFirst + "}{notOnce:" + examinee.examineDefault + "}");
+		if (examiner.npc) {
+			let pre = processText("{nv:pov:examine}", {pov:examiner}) + ' ' + getDisplayAliasLink(examinee, {article:DEFINITE}) + '.';
+			msg(pre);
+			s = `"${s}," ` + processText("{nv:pov:say}.", {pov:examiner});
+		}
+		msg(s);
+		handleExamineHolder({examiner:examiner, examinee:examinee, cmdString:cmdString});
 	},
-	regex:/^(xm|xanmag|kevin)$/,
 	properName:true,
-	parserAltNames:["xm","kevin"],
+	parserAltNames:["xm"],
 	talkto:"{random:\"I {random:like beer:can light any {objectLink:purple_lighter:lighter} on the first attempt},\"\
 	 says Xan{random:, with a nod at the end for emphasis:}:XanMag nods, whilst not listening at all}.",
 	love:"Everyone loves XanMag!",
@@ -123,12 +134,12 @@ createItem("XanMag", NPC(false), {
 	},
 	giveReaction:function(obj, multiple, char){
 	  if(obj==w.cigarette){
-		  msg ("Xan shakes his head.  \"No thanks.  I don't smoke cigarettes.\"");
+		  msg (`Xan shakes his head.  "No thanks.  I don't smoke cigarettes."`);
 	  }else if(obj==w.purple_lighter){
 		  if (w.purple_lighter.broken){
 		    w.purple_lighter.onMove(w.XanMag.name, w.purple_lighter.loc);
 		  }else{
-			msg("\"Nah.  I've got my own,\" says Xan, waving the lighter away.");  
+			msg(`"Nah.  I've got my own," says Xan, waving the lighter away.`);  
 		  }
 	  }else{
 		  msg(prefix(obj, multiple) + lang.done_msg);

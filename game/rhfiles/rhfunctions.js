@@ -283,6 +283,21 @@ function setNoConnection(){
 	console.log("SYSTEM MESSAGE:\nThere is no internet connection. YouTube functionality has been deactivated.")
 }
 
+function enterButtonPress(cmd){
+	//Calling this function with no arg will cause s to default to the text in the textbox.
+	if(cmd) $('#textbox').val(cmd);
+	const s = $('#textbox').val();
+    io.msgInputText(s); //This emulates printing the echo of the player's command
+    if (s) {
+		if (io.savedCommands[io.savedCommands.length - 1] !== s) {
+			io.savedCommands.push(s);
+        }
+        io.savedCommandsPos = io.savedCommands.length;
+        parser.parse(s);
+        $('#textbox').val('');
+	}
+}
+
 // UNUSED
 function hasGrandchildren(obj){
 	let grandparent = false;
@@ -292,6 +307,14 @@ function hasGrandchildren(obj){
 		if (kid.getContents) grandparent = true;
 	})
 	return grandparent;
+}
+
+function eatenByAGrue(){
+	clearScreen();
+	// disable all links!
+	msg (`You have been eaten by a grue.<br><br>
+	<h3>YOU ARE DEAD.</h3>`)
+	io.finish()
 }
 
 function reportBug(s){

@@ -5,6 +5,7 @@
 createRoom("cellar", {
   desc:"The cellar is small, dimly lit, and dingy.{once:  It sure is nice of XanMag to let you and Ralph stay here, though!}",
   up:new Exit("stairway"),
+  /*down: new Exit("cave_one"),*/
   afterEnter:function(){
 	if (w.TV.switchedon){
 		//msg("Ralph turns the TV off on the way out.");

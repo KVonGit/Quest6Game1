@@ -7,10 +7,10 @@ lang.on_top = "on top";
 lang.carrying = "carrying";
 lang.contentsForData.surface.prefix = 'on which you see ';
 lang.contentsForData.surface.suffix = '';
-//lang.open_successful = "{nv:char:open:true} {sb:container}.";
+lang.open_successful = "{nv:char:open:true} {nm:container:the}.";
 //lang.open_successful = "Done.";
 //lang.close_successful = "Done.";
-lang.look_inside = "Inside {nm:container:the}, {nv:char:can} see {param:list}.";
+lang.look_inside = "Inside {sb:container}, {nv:char:can} see {param:list}.";
 //lang.look_inside = "Inside, {nv:char:can} see {param:list}.";
 //lang.take_successful = "Taken.";
 //lang.drop_successful = "Dropped.";
@@ -94,7 +94,7 @@ lang.joiner_regex = /\b\, and\b|\,|\band\b/;
 
 //Make clicked commands add to list history (to fix AGAIN cmd)
 io.cmdlink = function(command, str) {
-  return `<a class="cmd-link" onclick="io.msgInputText('${command}'); parser.parse('${command}');clickedCmdLink('${command}');">${str}</a>`;
+  return `<a class="cmd-link" onclick="runCmd('${command}');">${str}</a>`;
 };
 
 //Make clicked "exits" add to list history (to fix AGAIN cmd)
@@ -106,6 +106,14 @@ io.clickExit = function(dir) {
   enterButtonPress();
 };
 
+// @DOC
+// Modified QuestJS v0.4 function to add to my command history array.
+function runCmd(cmd) {
+  if (io.inputIsDisabled) return;
+  io.msgInputText(cmd);
+  parser.parse(cmd);
+  clickedCmdLink(cmd);
+}
 
 //Make clicked "actions using side pane items" add to list history (to fix AGAIN cmd)
 io.clickItemAction = function(itemName, action) {

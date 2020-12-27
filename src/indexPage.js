@@ -2,11 +2,12 @@
 
 
 
-var desc = "In this small text adventure, you and your trusty sidekick (Ralph) "+
-    "need to look around and interact with things (and XanMag) until you figure out what to do."+
-    "<br/><br/>It's pretty straightforward.  It's really just to test out the new version of Quest."+
-    "<br/><br/><center>(Click on CREDITS at the bottom of this page for more info!)</center>";
-    
+//var desc = "In this small text adventure, you and your trusty sidekick (Ralph) "+
+//    "need to look around and interact with things (and XanMag) until you figure out what to do."+
+ //   "<br/><br/>It's pretty straightforward.  It's really just to test out the new version of Quest."+
+//    "<br/><br/><center>(Click on CREDITS at the bottom of this page for more info!)</center>";
+
+let desc = settings.gameDesc;
 
 (function(){
 	$("#game-desc").html(desc);
@@ -15,6 +16,8 @@ var desc = "In this small text adventure, you and your trusty sidekick (Ralph) "
 	$("#version").html("by " + settings.author)
 	$("#version").html("Version " + settings.version)
 	$("#ifid").html("Identification number: " + settings.ifid)
+	$("#genre").html(`GENRE: ${settings.genre}`)
+	$("#warnings").html(`WARNINGS:<br>${settings.warnings}`).css({'background-color':'red', 'color':'white', 'border':'1px solid white'})
 })();
 
     

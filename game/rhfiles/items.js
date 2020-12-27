@@ -18,8 +18,18 @@ createItem("Grue_Bot_5000", NPC(false), SURFACE(), CONTAINER(), TAKEABLE(), SWIT
 	loc:"table",
 	excludeFromAll:false,
 	examine: () => {
-		msg("He's just your typical, every day {nm:item}.", {item:w.Grue_Bot_5000});
-		handleExamineHolder(this);
+		let cmd = parser.currentCommand;
+		let examinee = cmd.cmd.name.startsWith("Npc") ?cmd.objects[1][0] : cmd.objects[0][0];
+		let [ /*undefined*/, examiner ] = params;
+		let cmdString = cmd.cmdString;
+		let s = processText("He's just your typical, every day {nm:item}", {item:w.Grue_Bot_5000});
+		if (examiner.npc) {
+			let pre = processText("{nv:pov:examine}", {pov:examiner}) + ' ' + getDisplayAliasLink(examinee, {article:DEFINITE}) + '.';
+			msg(pre);
+			s = `"${s}," ` + processText("{nv:pov:say}.", {pov:examiner});
+		}
+		msg(s);
+		handleExamineHolder({examiner:examiner, examinee:examinee, cmdString:cmdString});
 	}
 })
 

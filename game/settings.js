@@ -7,7 +7,7 @@ const debuginfo = (s) => { console.info(s) };
 
 settings.title = "Quest 6 Adventure 1";
 settings.author = "Richard Headkid";
-settings.version = "0.41";
+settings.version = "0.43";
 settings.warnings = "ADULT LANGUAGE | VIOLENCE | TOBACCO, DRUG, & ALCOHOL USE | TRIGGER WARNINGS: ALL";
 settings.ifid = "879D6C2b-1FE5-4C78-B9F5-579DE6310EC6";
 settings.serialNumber = "201202";
@@ -44,7 +44,8 @@ filesBak = filesBak.concat([
 	"rhfiles/rhTurnscripts",
 	"rhfiles/rhfunctions",
 	"rhfiles/cardGames",
-	"rhfiles/versionChanges"
+	"rhfiles/versionChanges",
+	"rhfiles/nowhere/nowhere"
 ]);
 
 //Set the modified array as settings.files
@@ -52,6 +53,7 @@ settings.files = filesBak;
 
 //>>>>>>>>>>>>>>>>>>>>===<<<<<<<<<<<<<<<<<<<<<<
 
+settings.panesCollapseAt = 0;
 
 //settings.linksEnabled = true
 
@@ -59,10 +61,6 @@ settings.lookCountsAsTurn = true
 
 settings.oxfordComma = true
 
-
-
-//==================
-var noArr = settings.libraries
 //============================
 
 settings.intro = "<h1 id='loading-el'>Loading . </h1>"
@@ -143,6 +141,8 @@ settings.setup = function(){
 
 		// Change the shortcut icon (for fun).
 		$(`[rel="shortcut icon"]`).attr('href', 'data:;base64,' + quIco)
+
+		$('.pane-div-finished').css('color','black');
 };
 
 
@@ -155,7 +155,6 @@ settings.thanks = ["<a href='https://textadventures.co.uk/user/view/_O1rjdv47U2x
    </a> for all the help with the code!\
    <br><br>For a list of version changes, \
    <a id='fake-link-1' href='javascript:void(0)' onclick='printVersionChanges();$(this).parent().remove();'>CLICK HERE</a>"];
-   let setNo = ()=>{noArr.push('nowhere/nowhere')};setNo();
 const walkthroughs = {
   a:[
     "u", "u", "open fridge", "get beer", "e", "give lighter to xm", "light cig", "give beer to xan",
@@ -163,3 +162,25 @@ const walkthroughs = {
 };
 
 
+settings.gameDesc = `In this small text adventure, you and your trusty sidekick (Ralph) need to look around and interact with things (and XanMag) until you figure out what to do.
+<br><br>
+It's pretty straightforward. It's really just to test out the new version of Quest.
+<br><br>
+(Click on CREDITS at the bottom of this page for more info!)`;
+
+settings.crueltyScale = {
+    0: "Merciful",
+    1: "Polite",
+    2: "Nasty",
+    3: "Cruel"
+};
+
+settings.crueltyDict = {
+	// Zarf's cruelty scale
+    'Merciful': 'You don’t have to use either undo or save.',
+    'Polite': 'If the interpreter offers single-turn undo, you don’t need to keep save files.',
+    'Nasty': 'You don’t need to save if the interpreter’s undo stack is at least as long as the move sequence that gets you in trouble.',
+    'Cruel': 'Sorry, you have to keep save files. (If your error was back at the beginning of the game, restarting is easier than undoing all the way back there.)'
+};
+
+settings.cruelty = 3; // Add this to the landing page!

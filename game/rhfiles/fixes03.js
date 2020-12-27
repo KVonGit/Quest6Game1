@@ -206,3 +206,22 @@ function handlePutInContainer(char, objects) {
 		    if (this.onClose) this.onClose(char)
 		    return true;
 	    };
+
+      //MOD 2020.12.23
+      lang.npcEnteringMsg = function(npc, origin) {
+        if (game.dark) return; // ADDED BY KV
+        let s = "";
+        let flag = false;
+        if (w[game.player.loc].canViewLocs && w[game.player.loc].canViewLocs.includes(npc.loc)) {
+          // Can the player see the location the NPC enters, from another location?
+          s = w[game.player.loc].canViewPrefix;
+          flag = true;
+        }
+        if (flag || npc.inSight()) {
+          s += lang.nounVerb(npc, "enter", !flag) + " " + lang.getName(w[npc.loc], {article:DEFINITE});
+          const exit = w[npc.loc].findExit(origin);
+          if (exit) s += " from " + util.niceDirection(exit.dir);
+          s += ".";
+          msg(s);
+        }
+      };

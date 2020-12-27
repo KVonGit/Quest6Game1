@@ -7,11 +7,11 @@ createRoom("nowhere", {
 createRoom ("cave_one", {
 	alias: "cave",
 	desc: "A dark cave.",
-	darkDesc:"It is pitch dark.  You are likely to be eaten by a grue.",
+	darkDesc:"You can't see anything in here.",
 	lightSource:function() {
-		return w.switch_for_cave.switchedon ? World.LIGHT_FULL : World.LIGHT_NONE;
+		return w.switch_for_cave.switchedon ? world.LIGHT_FULL : world.LIGHT_NONE;
 	},
-	up: new Exit("cave_one", {
+	up: new Exit("cellar", {
 		isHidden:function() { 
 			return false; 
 		}
@@ -20,7 +20,15 @@ createRoom ("cave_one", {
 	north: new Exit("cave_one"),
 	south: new Exit("cave_one"),
 	east: new Exit("cave_one"),
-	west: new Exit("cave_one")
+	west: new Exit("cave_one"),
+	afterEnter:function(){
+		if (w.TV.switchedon && game.player.previousLoc==="cellar"){
+			if (!settings.noConnection){
+				ytPlayer.setVolume('10');
+			}
+			msg("You can hear muffled sounds from the TV.");
+		}
+	},
 })
 
 createItem ("switch_for_cave", SWITCHABLE(false), {

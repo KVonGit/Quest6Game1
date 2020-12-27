@@ -20,12 +20,18 @@ body {
   padding: 0px 10px;
 }
 
+.cmd-link.disabled { /* Added by KV */
+  color: inherit;
+  cursor:inherit;
+}
 
-.cmd-link {
+.cmd-link:not(.disabled) { /*  Modified by KV */
   cursor: pointer;
   color:blue;
+  text-decoration: underline;
 }
-  
+
+
 
 .exit-link:not(.disabled), .object-link:not(.disabled){
 	cursor: pointer;

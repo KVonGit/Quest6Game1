@@ -120,5 +120,11 @@ settings.versionChanges = [
 	"0.40: Updated item_links library to show what lang.getName puts out.  (I had it a little off.)",
 
 	"0.41: Began adding JSDoc comments to the code.<br><br>"+
-	"Fixed bug with Ralph's name modifier.  (Thanks to Pertex!)"
+	"Fixed bug with Ralph's name modifier.  (Thanks to Pertex and mrangel!)<br><br>"+
+	"Added catch to check if it's dark before announcing an NPC entering the room.<br><br>"+
+	"Modified <code>io.finish</code> to disable all item and exit links.",
+
+	"0.42: Updated the way it is handled when container or npcs are examined.",
+
+	"0.43: Added stuff to the landing page (and to settings)."
 ];
