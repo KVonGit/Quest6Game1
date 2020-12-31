@@ -53,10 +53,6 @@ settings.files = filesBak;
 
 //>>>>>>>>>>>>>>>>>>>>===<<<<<<<<<<<<<<<<<<<<<<
 
-settings.panesCollapseAt = 0;
-
-//settings.linksEnabled = true
-
 settings.lookCountsAsTurn = true
 
 settings.oxfordComma = true

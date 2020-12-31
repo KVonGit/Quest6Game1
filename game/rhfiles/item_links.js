@@ -3,7 +3,7 @@
 //@DOC
 // ## ITEM LINKS LIB
 //
-// VERSION 0.11
+// VERSION 0.10
 //
 // AUTHOR: KV
 //
@@ -95,13 +95,11 @@ function updateItemLinkVerbs(obj){
 //
 //  - ```item``` - **&lt;OBJECT&gt;** The in-game item
 //
-//  - ```type``` - **&lt;NUMBER&gt;** [OPTIONAL] ```DEFINITE``` (which yields the number 2) or ```INDEFINITE``` (which yields 1) (leaving this empty yields no article)
-//
-// (Updated in version .011)
+//  - ```type``` - **&lt;BOOLEAN&gt;** [OPTIONAL] ```DEFINITE``` or ```INDEFINITE``` (leaving this empty yields no article)
 //
 // ---
 function getArticle(item, type){
-	if (!type || (type != DEFINITE && type != INDEFINITE)) return;
+	if (!type) return;
 	return type === DEFINITE ? lang.addDefiniteArticle(item) : lang.addIndefiniteArticle(item);
 }
 
@@ -114,23 +112,19 @@ function getArticle(item, type){
 // 
 //  - ```item``` - **&lt;STRING&gt;** The in-game item
 // 
-//  - ```options``` - **&lt;OBJECT&gt;** [OPTIONAL] Can contain 'capital' (a boolean) and/or 'article' (```DEFINITE``` or ```INDEFINITE```)
-//
-// (Updated in version 0.11)
+//  - ```options``` - **&lt;OBJECT&gt;** containing various option settings
+// 
+//  - ```cap``` - **&lt;BOOLEAN&gt;** - ```true``` to capitalize the first letter
 //
 //---
-function getDisplayAliasLink(item, options){
-	let { article: art, capital: cap } = options;
-	let article = getArticle(item, art) || '';
-	let id = lang.getNameOG(item);
-	if (cap) {
-		if (art) {
-			article = sentenceCase(article);
-		} else {
-			id = sentenceCase(id);
-		}
+function getDisplayAliasLink(item, options, cap){
+	let art = false;
+	if (options) art = options.article
+	let article = getArticle(item, art)
+	if (!article) {
+		article = '';
 	}
-	let s = article + ' ' + getItemLink(item, id);
+	let s = article + getItemLink(item);
 	s = s.trim();
 	return s;
 }
@@ -144,12 +138,11 @@ function getDisplayAliasLink(item, options){
 //
 //  **PARAM:**
 //
-//  - ```params``` - **&lt;OBJECT&gt;** Include examiner, examinee, and cmdString.
+//  - ```params``` - **&lt;OBJECT&gt;** This function doesn't even use any args.  (I just noticed this!)
 //
 //---
 function handleExamineHolder(params){
-	let s;
-	let {examiner, examinee: obj, cmdString } = params;
+	let obj = parser.currentCommand.objects[0][0];
 	if (!obj) return;
 	if (!obj.container && !obj.npc) return;
 	if (obj.container) {
@@ -164,17 +157,14 @@ function handleExamineHolder(params){
 			let subjVerb = processText("{pv:pov:see}", {pov:game.player});
 			pre += `, ${subjVerb} `;
 			contents = settings.linksEnabled ? getContentsLink(obj) : contents;
-			s = `${pre}${contents}`;
-			
+			msg(`${pre}${contents}.`);
 		}
 	} else {
 		let contents =  getAllChildrenLinks(obj)
 		if (contents == 'nothing') return;
 		let pre = processText('{pv:char:be:true} ' + lang.carrying, {char:obj});
-		s = `${pre} ${contents}`;
+		msg(`${pre} ${contents}.`);
 	}
-	s = examiner.npc ? getDisplayAliasLink(examiner,{capital:true, article:DEFINITE}) + ' examines ' + getDisplayAliasLink(obj, {article:DEFINITE}) + ' more closely, then continues.  "' + s + '."' : s + '.';
-	msg(s);
 }
 
 //@DOC
@@ -525,7 +515,7 @@ io.finishBak = io.finish;
 //@DOC
 // ### Function: _io.finish_()
 //
-//  Ends the story.  Modified to disable all item, exit, and command links beforehand.
+//  Ends the story.  Modified to disable all item and object links beforehand.
 //
 //(Mod added to this library in version 0.9)
 //
@@ -635,7 +625,8 @@ lang.getName = (item, options) => {
     let art = getArticle(item, options.article);
     if (!art) art = '';
     let cap = options && options.capital;
-    if (!item.room && !options.noLinks) s = getItemLink(item, s, cap);
+	//if (!item.room) s = getItemLink(item, s, cap);
+	if (!item.room && !options.noLinks) s = getItemLink(item, s, cap); // Modified by Pix to fix issue with NPC topics.
     s = art + s;
     s += util.getNameModifiers(item, options);
     return s;
