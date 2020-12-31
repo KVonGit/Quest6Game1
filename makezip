@@ -1,0 +1,5 @@
+#! /bin/bash
+
+7za a "$1".zip *
+
+exit 0
