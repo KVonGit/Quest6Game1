@@ -17,12 +17,12 @@ createItem("updateStatusBar_Turnscript",
 createItem("inTheDark",
 	{
 		eventPeriod:1,
-		eventActive:false,
+		eventActive:true,
 		turnsInDark: 0,
 		eventScript: () => {
 			if(game.dark){
 				w.inTheDark.turnsInDark++;
-				msg("It is pitch dark.  You are likely to be eaten by a grue.");
+				msg("You are likely to be eaten by a grue.");
 				if (w.inTheDark.turnsInDark >= 3){
 					eatenByAGrue();
 				}

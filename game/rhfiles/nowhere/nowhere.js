@@ -6,8 +6,8 @@ createRoom("nowhere", {
 
 createRoom ("cave_one", {
 	alias: "cave",
-	desc: "A dark cave.",
-	darkDesc:"You can't see anything in here.",
+	desc: "A dimly lit cave.",
+	darkDesc:"It is pitch dark.",
 	lightSource:function() {
 		return w.switch_for_cave.switchedon ? world.LIGHT_FULL : world.LIGHT_NONE;
 	},
@@ -30,6 +30,15 @@ createRoom ("cave_one", {
 		}
 	},
 })
+
+createItem("skeleton_key", {
+	loc:"Ralph",
+	examine: "A common, everyday skeleton key."
+})
+
+createItem("hatch", LOCKED_DOOR("skeleton_key", "cellar", "cave_one"), {
+	examine: "A small hatch in the {if:game.player.loc='cellar':floor:ceiling}.",
+  });
 
 createItem ("switch_for_cave", SWITCHABLE(false), {
 	alias: "light switch",

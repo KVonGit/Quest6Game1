@@ -3,19 +3,34 @@ body{
 	font-family:  monospace;
 	font-weight:bold;
 	/*line-height:16px;*/
-	font-size:1.25em;
+	font-size:1.35em;
 	color:silver;
-	text-shadow:black 1px -8px 13px;
+	text-shadow:black 0px -2px 0px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	margin:0;
 }
 #game-desc{
 	margin-right:15vw;
 	margin-left:15vw;
-	text-align: center;/*justify;*/
-	/*text-justify: inter-word;*/
+	text-align: center;
 	border:5px solid white;
 	background-color:black;
 	padding:12px;
 	color:silver;
+}
+#game-desc-title{
+	font-size: 1.88rem;
+}
+
+#warnings{
+	background-color:red;
+	color:white;
+	border:1px solid white;
+	margin-right:15vw;
+	margin-left:15vw;
+	padding-bottom: 8px;
 }
 
 button {
@@ -55,10 +70,23 @@ buttonalt:hover {
   border: 2px solid saddlebrown;
 }
 
-#demo {
+#credits {
 	font-family:  monospace;
 	font-weight:bold;
 	color:silver;
 	/*line-height:18px;*/
 	font-size:1.25em;
+	padding-bottom: 6px;
+}
+
+#creditsText{
+	font-family:  monospace;
+	font-weight:bold;
+	color:black;
+	background-color:white;
+	margin-right:15vw;
+	margin-left:15vw;
+	border: 1px solid black;
+	padding:18px;
+	text-shadow:none;
 }
