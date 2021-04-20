@@ -100,7 +100,7 @@ createItem("XanMag", NPC(false), {
 	},
 	properName:true,
 	parserAltNames:["xm"],
-	talkto:"{random:\"I {random:like beer:can light any {objectLink:purple_lighter:lighter} on the first attempt},\"\
+	talkto:"{random:\"I {random:like beer:can light any {item:purple_lighter:lighter} on the first attempt},\"\
 	 says Xan{random:, with a nod at the end for emphasis:}:XanMag nods, whilst not listening at all}.",
 	love:"Everyone loves XanMag!",
 	hugAttempts:0,
@@ -128,7 +128,7 @@ createItem("XanMag", NPC(false), {
 				}else if (w.beer.loc==="me") {
 					blah = " you know,";
 				}
-				msg("\"I'm like Brett Kavanaugh in one way,"+blah+"\" says XM.  \"I like beer!\"");
+				msg("\"I like beer!\" says XM.");
 			},
 		},
 	},

@@ -660,6 +660,28 @@ tp.text_processors.exits = function(arr, params) {
   return formatList(list, {lastJoiner:lang.list_or, nothing:lang.list_nowhere});
 }
 
+//@DOC
+// ### Function: _tp.text_processors.item(arr, params)
+//
+//  Modified to return a string containing an item link.
+//
+// Returns **&lt;STRING&gt;**
+//
+// - string with an item link
+//
+// **PARAMS:**
+//
+// - ```arr``` - **&lt;ARRAY&gt;** TODO: Ask Pixie how to describe this.
+//
+// - ```params``` - **&lt;OBJECT&gt;** TODO: Ask Pixie how to describe this.
+//
+// ---
+//@UNDOC
+tp.text_processors.item = function(data,params) {
+	let item = data[0];
+	let id = data[1] || item;
+	return getItemLink(w[item], id);
+}
 
 //@DOC
 // ## Click capturing
