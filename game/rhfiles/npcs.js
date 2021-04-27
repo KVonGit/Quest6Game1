@@ -100,7 +100,7 @@ createItem("XanMag", NPC(false), {
 	},
 	properName:true,
 	parserAltNames:["xm"],
-	talkto:"{random:\"I {random:like beer:can light any {item:purple_lighter:lighter} on the first attempt},\"\
+	talkto:"{random:\"I {random:like beer:can light any {nm:purple_lighter} on the first attempt},\"\
 	 says Xan{random:, with a nod at the end for emphasis:}:XanMag nods, whilst not listening at all}.",
 	love:"Everyone loves XanMag!",
 	hugAttempts:0,
